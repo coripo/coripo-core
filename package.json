@@ -1,0 +1,32 @@
+{
+  "name": "onecalendar-core",
+  "version": "1.0.0",
+  "description": "OneCalendar Core",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dariush-alipour/onecalendar-core.git"
+  },
+  "keywords": [
+    "calendar",
+    "onecalendar"
+  ],
+  "author": "Dariush Alipour <drsh.alipour@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dariush-alipour/onecalendar-core/issues"
+  },
+  "homepage": "https://github.com/dariush-alipour/onecalendar-core#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.3",
+    "mocha": "^3.2.0"
+  }
+}
