@@ -2,9 +2,9 @@
 const expect = require('chai').expect;
 const GregorianAdapter = require('../src/gregorian.adapter.js').Adapter;
 
-const gregorianAdapter = new GregorianAdapter();
-
 describe('Gregorian Adapter', () => {
+  const gregorianAdapter = new GregorianAdapter();
+
   describe('id', () => {
     it('should return a string', () => {
       expect(gregorianAdapter.id).to.be.a('string');
@@ -16,21 +16,22 @@ describe('Gregorian Adapter', () => {
       expect(gregorianAdapter.name).to.be.a('string');
     });
   });
-  describe('l10n', () => {
+
+  describe('l10n()', () => {
     it('should return an object containing the date given to the method', () => {
       const date = { year: 2017, month: 12, day: 20 };
       expect(gregorianAdapter.l10n(date)).to.equal(date);
     });
   });
 
-  describe('i18n', () => {
+  describe('i18n()', () => {
     it('should return an object containing the date given to the method', () => {
       const date = { year: 2017, month: 12, day: 20 };
       expect(gregorianAdapter.i18n(date)).to.equal(date);
     });
   });
 
-  describe('isValid', () => {
+  describe('isValid()', () => {
     it('should return true when input is (2016, 2, 29)', () => {
       const date = { year: 2016, month: 2, day: 29 };
       expect(gregorianAdapter.isValid(date)).to.be.true;
@@ -45,7 +46,7 @@ describe('Gregorian Adapter', () => {
     });
   });
 
-  describe('isLeap', () => {
+  describe('isLeap()', () => {
     it('should return false when input is 2015', () => {
       expect(gregorianAdapter.isLeap(2015)).to.be.false;
     });
@@ -60,7 +61,7 @@ describe('Gregorian Adapter', () => {
     });
   });
 
-  describe('getMonthName', () => {
+  describe('getMonthName()', () => {
     it('should return string when number is between 1 and 12', () => {
       for (let i = 1; i <= 12; i += 1) {
         expect(gregorianAdapter.getMonthName(i)).to.be.a('string');
@@ -74,7 +75,7 @@ describe('Gregorian Adapter', () => {
     });
   });
 
-  describe('getMonthLength', () => {
+  describe('getMonthLength()', () => {
     it('should return 31 when input is (2017, 1)', () => {
       expect(gregorianAdapter.getMonthLength(2017, 1)).to.equal(31);
     });
