@@ -1,6 +1,7 @@
 const Adapter = function Adapter() {
   const id = 'dariush-alipour.coripo.adapter.gregorian';
   const name = 'Gregorian';
+  const description = 'The Gregorian calendar is internationally the most widely used civil calendar.';
 
   const months = [
     { name: 'January', short: 'Jan' },
@@ -37,7 +38,7 @@ const Adapter = function Adapter() {
 
   const isLeap = year => ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
 
-  return { id, name, l10n, i18n, isValid, isLeap, getMonthName, getMonthLength };
+  return { id, name, description, l10n, i18n, isValid, isLeap, getMonthName, getMonthLength };
 };
 
 exports.Adapter = Adapter;

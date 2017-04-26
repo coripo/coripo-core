@@ -17,6 +17,12 @@ describe('Gregorian Adapter', () => {
     });
   });
 
+  describe('description', () => {
+    it('should return a string', () => {
+      expect(gregorianAdapter.description).to.be.a('string');
+    });
+  });
+
   describe('l10n()', () => {
     it('should return an object containing the date given to the method', () => {
       const date = { year: 2017, month: 12, day: 20 };
