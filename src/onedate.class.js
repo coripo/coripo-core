@@ -1,31 +1,16 @@
 const OneDate = function OneDate(config, helper) {
-  let object;
-  let year;
-  let month;
-  let day;
-  let adapterId;
-  let adapter;
-  let primaryAdapter;
-  let primaryAdapterId;
-
-  const construct = () => {
-    year = config.year;
-    month = config.month;
-    day = config.day;
-    adapterId = config.adapterId || helper.primaryAdapterId;
-    adapter = helper.getAdapter(adapterId);
-    primaryAdapterId = helper.primaryAdapterId;
-    primaryAdapter = helper.getAdapter(primaryAdapterId);
-  };
-  construct();
-
-  const getYear = () => year;
-  const getMonth = () => month;
-  const getDay = () => day;
+  const year = config.year;
+  const month = config.month;
+  const day = config.day;
+  const adapterId = config.adapterId || helper.primaryAdapterId;
+  const adapter = helper.getAdapter(adapterId);
+  const primaryAdapterId = helper.primaryAdapterId;
+  const primaryAdapter = helper.getAdapter(primaryAdapterId);
 
   const localToPrimary = (date) => {
     const i18nDate = adapter.i18n(date);
     const l10nDate = primaryAdapter.l10n(i18nDate);
+
     return l10nDate;
   };
 
@@ -36,6 +21,7 @@ const OneDate = function OneDate(config, helper) {
       month: (`0${date.month}`).slice(-2),
       day: (`0${date.day}`).slice(-2),
     };
+
     return parseInt(`${sdate.year}${sdate.month}${sdate.day}`, 10);
   };
 
@@ -48,11 +34,13 @@ const OneDate = function OneDate(config, helper) {
       month: jsDate.getMonth() + 1,
       day: jsDate.getDate(),
     });
-    year = l10nDate.year;
-    month = l10nDate.month;
-    day = l10nDate.day;
 
-    return object;
+    return new OneDate({
+      year: l10nDate.year,
+      month: l10nDate.month,
+      day: l10nDate.day,
+      adapterId: config.adapterId,
+    }, helper);
   };
 
   const offsetMonth = (offset) => {
@@ -64,11 +52,13 @@ const OneDate = function OneDate(config, helper) {
       month: jsDate.getMonth() + 1,
       day: jsDate.getDate(),
     });
-    year = l10nDate.year;
-    month = l10nDate.month;
-    day = l10nDate.day;
 
-    return object;
+    return new OneDate({
+      year: l10nDate.year,
+      month: l10nDate.month,
+      day: l10nDate.day,
+      adapterId: config.adapterId,
+    }, helper);
   };
 
   const offsetDay = (offset) => {
@@ -80,16 +70,16 @@ const OneDate = function OneDate(config, helper) {
       month: jsDate.getMonth() + 1,
       day: jsDate.getDate(),
     });
-    year = l10nDate.year;
-    month = l10nDate.month;
-    day = l10nDate.day;
 
-    return object;
+    return new OneDate({
+      year: l10nDate.year,
+      month: l10nDate.month,
+      day: l10nDate.day,
+      adapterId: config.adapterId,
+    }, helper);
   };
 
-  object = { getYear, getMonth, getDay, int, offsetYear, offsetMonth, offsetDay };
-
-  return object;
+  return { year, month, day, int, offsetYear, offsetMonth, offsetDay };
 };
 
 exports.OneDate = OneDate;
