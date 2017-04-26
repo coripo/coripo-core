@@ -114,6 +114,7 @@ describe('Event Class', () => {
         const events = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(-1));
         expect(events).to.have.lengthOf(0);
       });
+
       context('when since is bigger than till', () => {
         it('should return an array by length of 1', () => {
           const event = new Event({
@@ -127,6 +128,7 @@ describe('Event Class', () => {
         });
       });
     });
+
     context('when repeats is not empty', () => {
       it('should return an array by length of 2', () => {
         const event = new Event({
@@ -188,6 +190,37 @@ describe('Event Class', () => {
         });
         const events = event.query(sampleDate, sampleDate.offsetMonth(2));
         expect(events).to.have.lengthOf(3);
+      });
+    });
+
+    context('when sequels is not empty', () => {
+      it('should return an array by length of 11', () => {
+        const periodStart = new OneDate({ year: 2017, month: 4, day: 4 }, helper);
+        const periodCycle = 28;
+        const event = new Event({
+          title: 'menstrual cycle',
+          note: 'get some pads',
+          since: periodStart,
+          till: periodStart.offsetDay(4),
+          repeats: [
+            { times: -1, cycle: 'day', step: periodCycle },
+          ],
+          sequels: [
+            {
+              title: 'pre-period',
+              since: { scale: 'day', offset: -2 },
+              till: { scale: 'day', offset: -1 },
+            },
+            {
+              title: 'post-period',
+              since: { scale: 'day', offset: 5 },
+              till: { scale: 'day', offset: 6 },
+            },
+          ],
+        });
+        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
+          new OneDate({ year: 2017, month: 6, day: 30 }, helper));
+        expect(events).to.have.lengthOf(11);
       });
     });
   });
