@@ -43,10 +43,9 @@ describe('OneDate Class', () => {
     });
 
     context('immutability check', () => {
-      it('should still return 2017', () => {
+      it('should both return 20191005', () => {
         const date = new OneDate(dateConfig, helper);
-        date.offsetYear(2);
-        expect(date.year).to.equal(2017);
+        expect(date.offsetYear(2).int()).to.equal(date.offsetYear(2).int());
       });
     });
   });
@@ -78,11 +77,9 @@ describe('OneDate Class', () => {
     });
 
     context('immutability check', () => {
-      it('should still return 2017/10', () => {
+      it('should both return 20171105', () => {
         const date = new OneDate(dateConfig, helper);
-        date.offsetMonth(1);
-        expect(date.year).to.equal(2017);
-        expect(date.month).to.equal(10);
+        expect(date.offsetMonth(1).int()).to.equal(date.offsetMonth(1).int());
       });
     });
   });
@@ -114,11 +111,9 @@ describe('OneDate Class', () => {
     });
 
     context('immutability check', () => {
-      it('should still return 10/5', () => {
+      it('should both return 20171008', () => {
         const date = new OneDate(dateConfig, helper);
-        date.offsetDay(3);
-        expect(date.month).to.equal(10);
-        expect(date.day).to.equal(5);
+        expect(date.offsetDay(3).int()).to.equal(date.offsetDay(3).int());
       });
     });
   });
