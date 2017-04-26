@@ -1,5 +1,5 @@
 const Adapter = function Adapter() {
-  const id = 'dariush-alipour.onecalendar.adapter.gregorian';
+  const id = 'dariush-alipour.coripo.adapter.gregorian';
   const name = 'Gregorian';
 
   const months = [

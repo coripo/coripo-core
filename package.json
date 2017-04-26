@@ -1,25 +1,25 @@
 {
-  "name": "onecalendar-core",
+  "name": "coripo-core",
   "version": "1.0.4",
-  "description": "OneCalendar Core",
+  "description": "Coripo Core",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dariush-alipour/onecalendar-core.git"
+    "url": "git+https://github.com/coripo/coripo-core.git"
   },
   "keywords": [
     "calendar",
-    "onecalendar"
+    "coripo"
   ],
   "author": "Dariush Alipour <drsh.alipour@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dariush-alipour/onecalendar-core/issues"
+    "url": "https://github.com/coripo/coripo-core/issues"
   },
-  "homepage": "https://github.com/dariush-alipour/onecalendar-core#readme",
+  "homepage": "https://github.com/coripo/coripo-core#readme",
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^3.19.0",
