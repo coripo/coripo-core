@@ -39,7 +39,7 @@ const OneDate = function OneDate(config, helper) {
       year: l10nDate.year,
       month: l10nDate.month,
       day: l10nDate.day,
-      adapterId: config.adapterId,
+      adapterId,
     }, helper);
   };
 
@@ -57,7 +57,7 @@ const OneDate = function OneDate(config, helper) {
       year: l10nDate.year,
       month: l10nDate.month,
       day: l10nDate.day,
-      adapterId: config.adapterId,
+      adapterId,
     }, helper);
   };
 
@@ -75,7 +75,7 @@ const OneDate = function OneDate(config, helper) {
       year: l10nDate.year,
       month: l10nDate.month,
       day: l10nDate.day,
-      adapterId: config.adapterId,
+      adapterId,
     }, helper);
   };
 
