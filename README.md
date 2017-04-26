@@ -5,4 +5,5 @@ OneCalendar Core
 
 ## Notice
 This is not a stand-alone usable package.
+
 This package is a dependency for onecalendar-engine for real usage and a devDependency to run tests for any adapter or generator developed for onecalendar as a plugin.
