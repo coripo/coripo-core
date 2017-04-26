@@ -1,16 +1,8 @@
 const Event = function Event(config) {
-  let title;
-  let note;
-  let since;
-  let till;
-
-  const construct = () => {
-    title = config.title;
-    note = config.note || '';
-    since = config.since;
-    till = config.till || config.since;
-  };
-  construct();
+  const title = config.title;
+  const note = config.note || '';
+  const since = config.since;
+  const till = config.till || config.since;
 
   const includes = (event, _since, _till) => {
     if (_since.int() <= since.int() && _till.int() >= since.int()) {
