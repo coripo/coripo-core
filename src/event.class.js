@@ -1,4 +1,6 @@
+/* eslint-disable no-param-reassign */
 const Event = function Event(config) {
+  const overlapRule = { ALLOW: 'allow', TRIM: 'trim', REMOVE: 'remove', SPLIT: 'split' };
   const id = config.id || 0;
   const title = config.title;
   const color = config.color || '#000000';
@@ -8,6 +10,10 @@ const Event = function Event(config) {
   const repeats = config.repeats || [];
   const sequels = config.sequels || [];
   const virtual = config.virtual || false;
+  const priority = config.priority || 0;
+  const overlap = config.overlap || {};
+  overlap.internal = overlap.internal || overlapRule.ALLOW;
+  overlap.external = overlap.external || overlapRule.ALLOW;
 
   const offsetDate = (date, scale, step) => {
     switch (scale) {
@@ -31,8 +37,9 @@ const Event = function Event(config) {
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
     let events = [];
 
-    repeats.forEach((pattern) => {
+    repeats.forEach((pattern, index) => {
       let times = pattern.times;
+      let round = 1;
       let cursor = {
         since: offsetDate(since, pattern.cycle, pattern.step),
         till: offsetDate(till, pattern.cycle, pattern.step),
@@ -40,13 +47,22 @@ const Event = function Event(config) {
       while (times !== 0 && cursor.since.int() <= qTill.int()) {
         if (cursor.since.int() >= qSince.int()) {
           events = events.concat((new Event({
-            id, virtual: true, title, color, note, sequels, since: cursor.since, till: cursor.till,
+            id,
+            virtual: true,
+            priority: priority + (round * (index + 1) * (sequels.length + 1)),
+            title,
+            color,
+            note,
+            sequels,
+            since: cursor.since,
+            till: cursor.till,
           })).query(qSince, qTill));
         }
         cursor = {
           since: offsetDate(cursor.since, pattern.cycle, pattern.step),
           till: offsetDate(cursor.till, pattern.cycle, pattern.step),
         };
+        round += 1;
         times -= 1;
       }
     });
@@ -58,7 +74,7 @@ const Event = function Event(config) {
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
     let events = [];
 
-    sequels.forEach((sequel) => {
+    sequels.forEach((sequel, index) => {
       const sequelDates = {
         since: offsetDate(since, sequel.since.scale, sequel.since.offset),
         till: offsetDate(since, sequel.till.scale, sequel.till.offset),
@@ -66,6 +82,7 @@ const Event = function Event(config) {
       const realSequel = new Event({
         id,
         virtual: true,
+        priority: priority + (index + 1),
         title: sequel.title || title,
         note: sequel.note || note,
         color: sequel.color || color,
@@ -78,31 +95,98 @@ const Event = function Event(config) {
   };
 
   const includes = (event, _since, _till) => {
+    const qEvent = event || { since, till };
     const qSince = (_till.int() <= _since.int()) ? _till : _since;
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
-
-    if (qSince.int() <= since.int() && qTill.int() >= since.int()) {
-      return true;
+    let collides = [];
+    if (qSince.int() <= qEvent.since.int() && qTill.int() >= qEvent.since.int()) {
+      collides = collides.concat(['l']);
     }
-    if (qSince.int() <= till.int() && qTill.int() >= till.int()) {
-      return true;
+    if (qSince.int() <= qEvent.till.int() && qTill.int() >= qEvent.till.int()) {
+      collides = collides.concat(['r']);
     }
+    if (collides.length) return collides;
     return false;
   };
 
   const query = (_since, _till) => {
     let events = [];
-
-    events = events.concat(includes(this, _since, _till) ? [
+    events = events.concat(includes(undefined, _since, _till) ? [
       { id, virtual, title, color, note, since, till, sinceInt: since.int(), tillInt: till.int() },
     ] : []);
     events = events.concat(getRepeats(_since, _till));
     events = events.concat(getSequels(_since, _till));
 
+    switch (overlap.internal) {
+      case overlapRule.ALLOW: {
+        break;
+      }
+      case overlapRule.REMOVE: {
+        events = events.reduce((evts, event) => {
+          const parallel = evts.find(evt => evt.virtual && includes(event, evt.since, evt.till));
+          if (!parallel) return (evts = evts.concat([event]));
+          const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+          const winner = (parallel.priority > event.priority) ? parallel : event;
+          evts = items.concat([winner]);
+          return evts;
+        }, []);
+        break;
+      }
+      case overlapRule.TRIM: {
+        events = events.reduce((evts, event) => {
+          const parallel = evts.find(evt => evt.virtual && includes(event, evt.since, evt.till));
+          if (!parallel) return (evts = evts.concat([event]));
+          const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+          const pair = (parallel.priority > event.priority) ?
+            { strong: parallel, weak: event } :
+            { strong: event, weak: parallel };
+          evts = items.concat([pair.strong]);
+          for (let i = 1; i <= 2; i += 1) {
+            const collision = includes(pair.weak, pair.strong.since, pair.strong.till);
+            if (!collision) break;
+            if (collision.includes('r')) {
+              pair.weak = (new Event({
+                id,
+                virtual: true,
+                priority: pair.weak.priority,
+                title: pair.weak.title,
+                note: pair.weak.note,
+                color: pair.weak.color,
+                since: pair.weak.since,
+                till: pair.strong.since.offsetDay(-1),
+              })).query(_since, _till)[0];
+            } else if (collision.includes('l')) {
+              pair.weak = (new Event({
+                id,
+                virtual: true,
+                priority: pair.weak.priority,
+                title: pair.weak.title,
+                note: pair.weak.note,
+                color: pair.weak.color,
+                since: pair.strong.till.offsetDay(1),
+                till: pair.weak.till,
+              })).query(_since, _till)[0];
+            }
+          }
+          if (pair.weak.till.int() - pair.weak.since.int() >= 0) {
+            evts = evts.concat([pair.weak]);
+          }
+          return evts;
+        }, []);
+        break;
+      }
+      case overlapRule.SPLIT: {
+        // TODO
+        break;
+      }
+      default:
+        break;
+    }
+
     return events;
   };
 
-  return { title, color, note, since, till, query };
+  return { title, color, note, since, till, overlap: overlap.external, query };
 };
 
 exports.Event = Event;

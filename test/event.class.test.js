@@ -222,6 +222,54 @@ describe('Event Class', () => {
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
         expect(events).to.have.lengthOf(11);
       });
+
+      it('should return an array by length of 2', () => {
+        const event = new Event({
+          title: 'overlap remove test',
+          since: new OneDate({ year: 2017, month: 4, day: 4 }, helper),
+          till: new OneDate({ year: 2017, month: 4, day: 4 }, helper).offsetDay(3),
+          overlap: { internal: 'remove' },
+          sequels: [
+            {
+              title: 'removed stage',
+              since: { scale: 'day', offset: 1 },
+              till: { scale: 'day', offset: 2 },
+            },
+            {
+              title: 'remaining stage',
+              since: { scale: 'day', offset: 2 },
+              till: { scale: 'day', offset: 3 },
+            },
+          ],
+        });
+        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
+          new OneDate({ year: 2017, month: 6, day: 30 }, helper));
+        expect(events).to.have.lengthOf(2);
+      });
+
+      it.only('should return an array by length of 3', () => {
+        const event = new Event({
+          title: 'overlap trim test',
+          since: new OneDate({ year: 2017, month: 4, day: 4 }, helper),
+          till: new OneDate({ year: 2017, month: 4, day: 4 }, helper).offsetDay(3),
+          overlap: { internal: 'trim' },
+          sequels: [
+            {
+              title: 'trimmed stage',
+              since: { scale: 'day', offset: 4 },
+              till: { scale: 'day', offset: 8 },
+            },
+            {
+              title: 'remaining stage',
+              since: { scale: 'day', offset: 2 },
+              till: { scale: 'day', offset: 5 },
+            },
+          ],
+        });
+        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
+          new OneDate({ year: 2017, month: 6, day: 30 }, helper));
+        expect(events).to.have.lengthOf(3);
+      });
     });
   });
 });
