@@ -247,7 +247,7 @@ describe('Event Class', () => {
         expect(events).to.have.lengthOf(2);
       });
 
-      it.only('should return an array by length of 3', () => {
+      it('should return an array by length of 3', () => {
         const event = new Event({
           title: 'overlap trim test',
           since: new OneDate({ year: 2017, month: 4, day: 4 }, helper),
