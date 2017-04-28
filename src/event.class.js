@@ -193,7 +193,6 @@ const Event = function Event(config) {
         id,
         virtual,
         title,
-        priority,
         color,
         note,
         since,
