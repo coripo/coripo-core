@@ -199,7 +199,7 @@ const Event = function Event(config) {
     events = events.concat(getSequels(_since, _till));
     events = events.concat(getRepeats(_since, _till));
     events = handleOverlaps(events, _since, _till);
-    return events.sort((a, b) => a.sinceInt - b.sinceInt);
+    return events.sort((a, b) => a.since.int() - b.since.int());
   };
 
   return { id, type, virtual, title, color, note, since, till, overlap: overlap.external, query };
