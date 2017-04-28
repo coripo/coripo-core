@@ -247,28 +247,41 @@ describe('Event Class', () => {
         expect(events).to.have.lengthOf(2);
       });
 
-      it('should return an array by length of 3', () => {
+      it('should return an array by length of 23', () => {
+        const periodStart = new OneDate({ year: 2017, month: 4, day: 3 }, helper);
+        const periodLength = 8;
+        const cycleLength = 16;
         const event = new Event({
-          title: 'overlap trim test',
-          since: new OneDate({ year: 2017, month: 4, day: 4 }, helper),
-          till: new OneDate({ year: 2017, month: 4, day: 4 }, helper).offsetDay(3),
+          title: 'Period Days',
+          color: '#ee10f6',
+          since: periodStart,
+          till: periodStart.offsetDay(periodLength - 1),
           overlap: { internal: 'trim' },
+          repeats: [{ times: -1, cycle: 'day', step: cycleLength }],
           sequels: [
             {
-              title: 'trimmed stage',
-              since: { scale: 'day', offset: 4 },
-              till: { scale: 'day', offset: 8 },
+              title: 'Peak Ovulation',
+              color: '#00aeef',
+              since: { scale: 'day', offset: 10 },
+              till: { scale: 'day', offset: 14 },
             },
             {
-              title: 'remaining stage',
-              since: { scale: 'day', offset: 2 },
-              till: { scale: 'day', offset: 5 },
+              title: 'Pre-Period',
+              color: '#f36',
+              since: { scale: 'day', offset: -2 },
+              till: { scale: 'day', offset: -1 },
+            },
+            {
+              title: 'Post-Period',
+              color: '#7e70ff',
+              since: { scale: 'day', offset: periodLength },
+              till: { scale: 'day', offset: periodLength + 1 },
             },
           ],
         });
         const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
-        expect(events).to.have.lengthOf(3);
+        expect(events).to.have.lengthOf(23);
       });
     });
   });

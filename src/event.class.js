@@ -109,14 +109,8 @@ const Event = function Event(config) {
     return false;
   };
 
-  const query = (_since, _till) => {
-    let events = [];
-    events = events.concat(includes(undefined, _since, _till) ? [
-      { id, virtual, title, color, note, since, till, sinceInt: since.int(), tillInt: till.int() },
-    ] : []);
-    events = events.concat(getRepeats(_since, _till));
-    events = events.concat(getSequels(_since, _till));
-
+  const handleOverlaps = (_events, _since, _till) => {
+    let events = _events;
     switch (overlap.internal) {
       case overlapRule.ALLOW: {
         break;
@@ -137,39 +131,45 @@ const Event = function Event(config) {
           const parallel = evts.find(evt => evt.virtual && includes(event, evt.since, evt.till));
           if (!parallel) return (evts = evts.concat([event]));
           const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
-          const pair = (parallel.priority > event.priority) ?
-            { strong: parallel, weak: event } :
-            { strong: event, weak: parallel };
-          evts = items.concat([pair.strong]);
+          let strong;
+          let weak;
+          if (parallel.priority > event.priority) {
+            strong = parallel;
+            weak = event;
+          } else {
+            strong = event;
+            weak = parallel;
+          }
+          evts = items.concat([strong]);
           for (let i = 1; i <= 2; i += 1) {
-            const collision = includes(pair.weak, pair.strong.since, pair.strong.till);
+            const collision = includes(weak, strong.since, strong.till);
             if (!collision) break;
             if (collision.includes('r')) {
-              pair.weak = (new Event({
+              weak = (new Event({
                 id,
                 virtual: true,
-                priority: pair.weak.priority,
-                title: pair.weak.title,
-                note: pair.weak.note,
-                color: pair.weak.color,
-                since: pair.weak.since,
-                till: pair.strong.since.offsetDay(-1),
+                priority: weak.priority,
+                title: weak.title,
+                note: weak.note,
+                color: weak.color,
+                since: weak.since,
+                till: strong.since.offsetDay(-1),
               })).query(_since, _till)[0];
             } else if (collision.includes('l')) {
-              pair.weak = (new Event({
+              weak = (new Event({
                 id,
                 virtual: true,
-                priority: pair.weak.priority,
-                title: pair.weak.title,
-                note: pair.weak.note,
-                color: pair.weak.color,
-                since: pair.strong.till.offsetDay(1),
-                till: pair.weak.till,
+                priority: weak.priority,
+                title: weak.title,
+                note: weak.note,
+                color: weak.color,
+                since: strong.till.offsetDay(1),
+                till: weak.till,
               })).query(_since, _till)[0];
             }
           }
-          if (pair.weak.till.int() - pair.weak.since.int() >= 0) {
-            evts = evts.concat([pair.weak]);
+          if (weak.till.int() - weak.since.int() >= 0) {
+            evts = evts.concat([weak]);
           }
           return evts;
         }, []);
@@ -184,6 +184,30 @@ const Event = function Event(config) {
     }
 
     return events;
+  };
+
+  const query = (_since, _till) => {
+    let events = [];
+    events = events.concat(includes(undefined, _since, _till) ? [
+      {
+        id,
+        virtual,
+        title,
+        priority,
+        color,
+        note,
+        since,
+        till,
+        sinceInt: since.int(),
+        tillInt: till.int(),
+      },
+    ] : []);
+    events = events.concat(getSequels(_since, _till));
+    events = events.concat(getRepeats(_since, _till));
+
+    events = handleOverlaps(events, _since, _till);
+
+    return events.sort((a, b) => a.sinceInt - b.sinceInt);
   };
 
   return { title, color, note, since, till, overlap: overlap.external, query };
