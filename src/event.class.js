@@ -2,7 +2,7 @@
 const Event = function Event(config) {
   const overlapRule = { ALLOW: 'allow', TRIM: 'trim', REMOVE: 'remove', SPLIT: 'split' };
   const id = config.id || 0;
-  const type = config.type || 'unknown';
+  const generatorId = config.generatorId || 'unknown';
   const title = config.title;
   const color = config.color || '#000000';
   const note = config.note || '';
@@ -49,7 +49,7 @@ const Event = function Event(config) {
         if (cursor.since.int() >= qSince.int()) {
           events = events.concat((new Event({
             id,
-            type,
+            generatorId,
             virtual: true,
             priority: priority + (round * (index + 1) * (sequels.length + 1)),
             title,
@@ -83,7 +83,7 @@ const Event = function Event(config) {
       };
       const realSequel = new Event({
         id,
-        type,
+        generatorId,
         virtual: true,
         priority: priority + (index + 1),
         title: sequel.title || title,
@@ -150,7 +150,7 @@ const Event = function Event(config) {
             if (collision.includes('r')) {
               weak = (new Event({
                 id,
-                type,
+                generatorId,
                 virtual: true,
                 priority: weak.priority,
                 title: weak.title,
@@ -162,7 +162,7 @@ const Event = function Event(config) {
             } else if (collision.includes('l')) {
               weak = (new Event({
                 id,
-                type,
+                generatorId,
                 virtual: true,
                 priority: weak.priority,
                 title: weak.title,
@@ -194,7 +194,7 @@ const Event = function Event(config) {
   const query = (_since, _till) => {
     let events = [];
     events = events.concat(includes(undefined, _since, _till) ? [
-      { id, type, virtual, title, color, note, since, till },
+      { id, generatorId, virtual, title, color, note, since, till },
     ] : []);
     events = events.concat(getSequels(_since, _till));
     events = events.concat(getRepeats(_since, _till));
@@ -202,7 +202,7 @@ const Event = function Event(config) {
     return events.sort((a, b) => a.since.int() - b.since.int());
   };
 
-  return { id, type, virtual, title, color, note, since, till, overlap: overlap.external, query };
+  return { id, generatorId, virtual, title, color, note, since, till, overlap: overlap.external, query };
 };
 
 exports.Event = Event;
