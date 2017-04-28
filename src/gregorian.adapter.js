@@ -1,5 +1,5 @@
 const Adapter = function Adapter() {
-  const id = 'dariush-alipour.coripo.adapter.gregorian';
+  const id = 'coripo.coripo.adapter.gregorian';
   const name = 'Gregorian';
   const description = 'The Gregorian calendar is internationally the most widely used civil calendar.';
 
