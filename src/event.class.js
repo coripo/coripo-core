@@ -121,11 +121,13 @@ const Event = function Event(config) {
       }
       case overlapRule.REMOVE: {
         events = events.reduce((evts, event) => {
-          const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
+          const parallels = evts
+            .filter(evt => evt.virtual && includes(event, evt.since, evt.till))
+            .sort((a, b) => b.priority - a.priority);
           if (!parallels.length) return evts.concat([event]);
-          const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
-          const winner = parallels.sort((a, b) => b.priority - a.priority)[0];
-          return items.concat([winner]);
+          const items = evts
+            .filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+          return items.concat([parallels[0]]);
         }, []);
         break;
       }
@@ -134,8 +136,9 @@ const Event = function Event(config) {
           const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
           if (!parallels.length) return evts.concat([event]);
           let items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
-          const master = parallels.concat([event]).sort((a, b) => b.priority - a.priority)[0];
-          const slaves = parallels.concat([event]).sort((a, b) => b.priority - a.priority).slice(1);
+          const conflicts = parallels.concat([event]).sort((a, b) => b.priority - a.priority);
+          const master = conflicts[0];
+          const slaves = conflicts.slice(1);
           items = items.concat([master]);
           const trimmedSlaves = slaves.map((evt) => {
             let slave = evt;
@@ -172,8 +175,7 @@ const Event = function Event(config) {
             }
             return slave;
           }).filter(evt => evt.till.int() - evt.since.int() >= 0);
-          items = items.concat(trimmedSlaves);
-          return items;
+          return items.concat(trimmedSlaves);
         }, []);
         break;
       }
