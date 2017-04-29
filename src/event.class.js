@@ -50,6 +50,7 @@ const Event = function Event(config) {
             id,
             generatorId,
             virtual: true,
+            overlap,
             priority: priority + (round * (index + 1) * (sequels.length + 1)),
             title,
             color,
@@ -84,6 +85,7 @@ const Event = function Event(config) {
         id,
         generatorId,
         virtual: true,
+        overlap,
         priority: priority + (index + 1),
         title: sequel.title || title,
         note: sequel.note || note,
@@ -144,6 +146,7 @@ const Event = function Event(config) {
                   id,
                   generatorId,
                   virtual: true,
+                  overlap,
                   priority: slave.priority,
                   title: slave.title,
                   note: slave.note,
@@ -156,6 +159,7 @@ const Event = function Event(config) {
                   id,
                   generatorId,
                   virtual: true,
+                  overlap,
                   priority: slave.priority,
                   title: slave.title,
                   note: slave.note,
@@ -187,7 +191,7 @@ const Event = function Event(config) {
   const query = (_since, _till) => {
     let events = [];
     events = events.concat(includes(undefined, _since, _till) ? [
-      { id, generatorId, virtual, title, color, note, since, till },
+      { id, generatorId, virtual, overlap: overlap.external, title, color, note, since, till },
     ] : []);
     events = events.concat(getSequels(_since, _till));
     events = events.concat(getRepeats(_since, _till));

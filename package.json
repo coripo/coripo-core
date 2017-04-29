@@ -1,6 +1,6 @@
 {
   "name": "coripo-core",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "Coripo Core",
   "main": "index.js",
   "scripts": {
