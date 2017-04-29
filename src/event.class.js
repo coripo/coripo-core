@@ -193,7 +193,18 @@ const Event = function Event(config) {
   const query = (_since, _till) => {
     let events = [];
     events = events.concat(collides(undefined, _since, _till) ? [
-      { id, generatorId, virtual, overlap: overlap.external, title, color, note, since, till },
+      {
+        id,
+        generatorId,
+        virtual,
+        overlap: overlap.external,
+        title,
+        color,
+        note,
+        since,
+        till,
+        collides: (qsince, qtill) => collides(undefined, qsince, qtill),
+      },
     ] : []);
     events = events.concat(getSequels(_since, _till));
     events = events.concat(getRepeats(_since, _till));
