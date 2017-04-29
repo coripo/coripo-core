@@ -120,10 +120,10 @@ const Event = function Event(config) {
       }
       case overlapRule.REMOVE: {
         events = events.reduce((evts, event) => {
-          const parallel = evts.find(evt => evt.virtual && includes(event, evt.since, evt.till));
-          if (!parallel) return (evts = evts.concat([event]));
+          const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
+          if (!parallels.length) return (evts = evts.concat([event]));
           const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
-          const winner = (parallel.priority > event.priority) ? parallel : event;
+          const winner = parallels.sort((a, b) => b.priority - a.priority)[0];
           evts = items.concat([winner]);
           return evts;
         }, []);
@@ -131,51 +131,46 @@ const Event = function Event(config) {
       }
       case overlapRule.TRIM: {
         events = events.reduce((evts, event) => {
-          const parallel = evts.find(evt => evt.virtual && includes(event, evt.since, evt.till));
-          if (!parallel) return (evts = evts.concat([event]));
+          const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
+          if (!parallels.length) return (evts = evts.concat([event]));
           const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
-          let strong;
-          let weak;
-          if (parallel.priority > event.priority) {
-            strong = parallel;
-            weak = event;
-          } else {
-            strong = event;
-            weak = parallel;
-          }
-          evts = items.concat([strong]);
-          for (let i = 1; i <= 2; i += 1) {
-            const collision = includes(weak, strong.since, strong.till);
-            if (!collision) break;
-            if (collision.includes('r')) {
-              weak = (new Event({
-                id,
-                generatorId,
-                virtual: true,
-                priority: weak.priority,
-                title: weak.title,
-                note: weak.note,
-                color: weak.color,
-                since: weak.since,
-                till: strong.since.offsetDay(-1),
-              })).query(_since, _till)[0];
-            } else if (collision.includes('l')) {
-              weak = (new Event({
-                id,
-                generatorId,
-                virtual: true,
-                priority: weak.priority,
-                title: weak.title,
-                note: weak.note,
-                color: weak.color,
-                since: strong.till.offsetDay(1),
-                till: weak.till,
-              })).query(_since, _till)[0];
+          const master = parallels.concat([event]).sort((a, b) => b.priority - a.priority)[0];
+          const slaves = parallels.concat([event]).sort((a, b) => b.priority - a.priority).slice(1);
+          evts = items.concat([master]);
+          const trimmedSlaves = slaves.map((evt) => {
+            let slave = evt;
+            let collision = includes(slave, master.since, master.till);
+            while (collision) {
+              if (collision.includes('r')) {
+                slave = (new Event({
+                  id,
+                  generatorId,
+                  virtual: true,
+                  priority: slave.priority,
+                  title: slave.title,
+                  note: slave.note,
+                  color: slave.color,
+                  since: slave.since,
+                  till: master.since.offsetDay(-1),
+                })).query(_since, _till)[0];
+              } else if (collision.includes('l')) {
+                slave = (new Event({
+                  id,
+                  generatorId,
+                  virtual: true,
+                  priority: slave.priority,
+                  title: slave.title,
+                  note: slave.note,
+                  color: slave.color,
+                  since: master.till.offsetDay(1),
+                  till: slave.till,
+                })).query(_since, _till)[0];
+              }
+              collision = includes(slave, master.since, master.till);
             }
-          }
-          if (weak.till.int() - weak.since.int() >= 0) {
-            evts = evts.concat([weak]);
-          }
+            return slave;
+          }).filter(evt => evt.till.int() - evt.since.int() >= 0);
+          evts = evts.concat(trimmedSlaves);
           return evts;
         }, []);
         break;
