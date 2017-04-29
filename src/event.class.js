@@ -98,18 +98,18 @@ const Event = function Event(config) {
     return events;
   };
 
-  const includes = (event, _since, _till) => {
+  const collides = (event, _since, _till) => {
     const qEvent = event || { since, till };
     const qSince = (_till.int() <= _since.int()) ? _till : _since;
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
-    let collides = [];
+    let collisions = [];
     if (qSince.int() <= qEvent.since.int() && qTill.int() >= qEvent.since.int()) {
-      collides = collides.concat(['l']);
+      collisions = collisions.concat(['l']);
     }
     if (qSince.int() <= qEvent.till.int() && qTill.int() >= qEvent.till.int()) {
-      collides = collides.concat(['r']);
+      collisions = collisions.concat(['r']);
     }
-    if (collides.length) return collides;
+    if (collisions.length) return collisions;
     return false;
   };
 
@@ -122,27 +122,27 @@ const Event = function Event(config) {
       case overlapRule.REMOVE: {
         events = events.reduce((evts, event) => {
           const parallels = evts
-            .filter(evt => evt.virtual && includes(event, evt.since, evt.till))
+            .filter(evt => evt.virtual && collides(event, evt.since, evt.till))
             .sort((a, b) => b.priority - a.priority);
           if (!parallels.length) return evts.concat([event]);
           const items = evts
-            .filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+            .filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
           return items.concat([parallels[0]]);
         }, []);
         break;
       }
       case overlapRule.TRIM: {
         events = events.reduce((evts, event) => {
-          const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
+          const parallels = evts.filter(evt => evt.virtual && collides(event, evt.since, evt.till));
           if (!parallels.length) return evts.concat([event]);
-          let items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+          let items = evts.filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
           const conflicts = parallels.concat([event]).sort((a, b) => b.priority - a.priority);
           const master = conflicts[0];
           const slaves = conflicts.slice(1);
           items = items.concat([master]);
           const trimmedSlaves = slaves.map((evt) => {
             let slave = evt;
-            let collision = includes(slave, master.since, master.till);
+            let collision = collides(slave, master.since, master.till);
             while (collision) {
               if (collision.includes('r')) {
                 slave = (new Event({
@@ -171,7 +171,7 @@ const Event = function Event(config) {
                   till: slave.till,
                 })).query(_since, _till)[0];
               }
-              collision = includes(slave, master.since, master.till);
+              collision = collides(slave, master.since, master.till);
             }
             return slave;
           }).filter(evt => evt.till.int() - evt.since.int() >= 0);
@@ -192,7 +192,7 @@ const Event = function Event(config) {
 
   const query = (_since, _till) => {
     let events = [];
-    events = events.concat(includes(undefined, _since, _till) ? [
+    events = events.concat(collides(undefined, _since, _till) ? [
       { id, generatorId, virtual, overlap: overlap.external, title, color, note, since, till },
     ] : []);
     events = events.concat(getSequels(_since, _till));
@@ -211,6 +211,7 @@ const Event = function Event(config) {
     since,
     till,
     overlap: overlap.external,
+    collides: (_since, _till) => collides(undefined, _since, _till),
     query,
   };
 };

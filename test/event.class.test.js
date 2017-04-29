@@ -285,4 +285,38 @@ describe('Event Class', () => {
       });
     });
   });
+  describe('collides()', () => {
+    it('should return false', () => {
+      const event = new Event({
+        title: 'jack\'s bday',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate.offsetDay(3), sampleDate.offsetDay(4))).to.be.false;
+    });
+    it('should return [l]', () => {
+      const event = new Event({
+        title: 'jack\'s bday',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l']);
+    });
+    it('should return [l, r]', () => {
+      const event = new Event({
+        title: 'jack\'s bday',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r']);
+    });
+    it('should return [r]', () => {
+      const event = new Event({
+        title: 'jack\'s bday',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['r']);
+    });
+  });
 });
