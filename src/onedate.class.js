@@ -26,55 +26,31 @@ const OneDate = function OneDate(config, helper) {
   };
 
   const offsetYear = (offset) => {
-    const i18nDate = adapter.i18n({ year, month, day });
-    const jsDate = new Date(`${i18nDate.year}-${i18nDate.month}-${i18nDate.day}`);
-    jsDate.setFullYear(jsDate.getFullYear() + offset);
-    const l10nDate = adapter.l10n({
-      year: jsDate.getFullYear(),
-      month: jsDate.getMonth() + 1,
-      day: jsDate.getDate(),
-    });
-
+    const date = adapter.offsetYear({ year, month, day }, offset);
     return new OneDate({
-      year: l10nDate.year,
-      month: l10nDate.month,
-      day: l10nDate.day,
+      year: date.year,
+      month: date.month,
+      day: date.day,
       adapterId,
     }, helper);
   };
 
   const offsetMonth = (offset) => {
-    const i18nDate = adapter.i18n({ year, month, day });
-    const jsDate = new Date(`${i18nDate.year}-${i18nDate.month}-${i18nDate.day}`);
-    jsDate.setMonth(jsDate.getMonth() + offset);
-    const l10nDate = adapter.l10n({
-      year: jsDate.getFullYear(),
-      month: jsDate.getMonth() + 1,
-      day: jsDate.getDate(),
-    });
-
+    const date = adapter.offsetMonth({ year, month, day }, offset);
     return new OneDate({
-      year: l10nDate.year,
-      month: l10nDate.month,
-      day: l10nDate.day,
+      year: date.year,
+      month: date.month,
+      day: date.day,
       adapterId,
     }, helper);
   };
 
   const offsetDay = (offset) => {
-    const i18nDate = adapter.i18n({ year, month, day });
-    const jsDate = new Date(`${i18nDate.year}-${i18nDate.month}-${i18nDate.day}`);
-    jsDate.setDate(jsDate.getDate() + offset);
-    const l10nDate = adapter.l10n({
-      year: jsDate.getFullYear(),
-      month: jsDate.getMonth() + 1,
-      day: jsDate.getDate(),
-    });
-
+    const date = adapter.offsetDay({ year, month, day }, offset);
     return new OneDate({
-      year: l10nDate.year,
-      month: l10nDate.month,
-      day: l10nDate.day,
+      year: date.year,
+      month: date.month,
+      day: date.day,
       adapterId,
     }, helper);
   };
