@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 const Event = function Event(config) {
   const overlapRule = { ALLOW: 'allow', TRIM: 'trim', REMOVE: 'remove', SPLIT: 'split' };
   const id = config.id || 0;
@@ -121,22 +120,21 @@ const Event = function Event(config) {
       case overlapRule.REMOVE: {
         events = events.reduce((evts, event) => {
           const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
-          if (!parallels.length) return (evts = evts.concat([event]));
+          if (!parallels.length) return evts.concat([event]);
           const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
           const winner = parallels.sort((a, b) => b.priority - a.priority)[0];
-          evts = items.concat([winner]);
-          return evts;
+          return items.concat([winner]);
         }, []);
         break;
       }
       case overlapRule.TRIM: {
         events = events.reduce((evts, event) => {
           const parallels = evts.filter(evt => evt.virtual && includes(event, evt.since, evt.till));
-          if (!parallels.length) return (evts = evts.concat([event]));
-          const items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
+          if (!parallels.length) return evts.concat([event]);
+          let items = evts.filter(evt => !(evt.virtual && includes(event, evt.since, evt.till)));
           const master = parallels.concat([event]).sort((a, b) => b.priority - a.priority)[0];
           const slaves = parallels.concat([event]).sort((a, b) => b.priority - a.priority).slice(1);
-          evts = items.concat([master]);
+          items = items.concat([master]);
           const trimmedSlaves = slaves.map((evt) => {
             let slave = evt;
             let collision = includes(slave, master.since, master.till);
@@ -170,8 +168,8 @@ const Event = function Event(config) {
             }
             return slave;
           }).filter(evt => evt.till.int() - evt.since.int() >= 0);
-          evts = evts.concat(trimmedSlaves);
-          return evts;
+          items = items.concat(trimmedSlaves);
+          return items;
         }, []);
         break;
       }
