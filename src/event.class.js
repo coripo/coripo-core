@@ -197,7 +197,18 @@ const Event = function Event(config) {
     return events.sort((a, b) => a.since.int() - b.since.int());
   };
 
-  return { id, generatorId, virtual, title, color, note, since, till, overlap: overlap.external, query };
+  return {
+    id,
+    generatorId,
+    virtual,
+    title,
+    color,
+    note,
+    since,
+    till,
+    overlap: overlap.external,
+    query,
+  };
 };
 
 exports.Event = Event;
