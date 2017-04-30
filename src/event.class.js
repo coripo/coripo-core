@@ -170,7 +170,7 @@ const Event = function Event(config) {
                   generatorId: slave.generatorId,
                   virtual: slave.virtual,
                   repeated: slave.repeated,
-                  overlap: slave.repeated,
+                  overlap: slave.overlap,
                   priority: slave.priority,
                   title: slave.title,
                   note: slave.note,
