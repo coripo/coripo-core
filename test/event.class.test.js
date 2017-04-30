@@ -20,7 +20,7 @@ describe('Event Class', () => {
   describe('title', () => {
     it('should return string', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         since: sampleDate,
       });
       expect(event.title).to.be.a('string');
@@ -30,7 +30,7 @@ describe('Event Class', () => {
   describe('color', () => {
     it('should return string', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         color: '#f811f8',
         since: sampleDate,
       });
@@ -41,7 +41,7 @@ describe('Event Class', () => {
   describe('note', () => {
     it('should return string', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         note: 'get a cake for him',
         since: sampleDate,
       });
@@ -52,7 +52,7 @@ describe('Event Class', () => {
   describe('since', () => {
     it('should return OneDate', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         note: 'get a cake for him',
         since: sampleDate,
       });
@@ -63,7 +63,7 @@ describe('Event Class', () => {
   describe('till', () => {
     it('should return 20171015', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         note: 'get a cake for him',
         since: sampleDate,
         till: sampleDate.offsetDay(10),
@@ -76,7 +76,7 @@ describe('Event Class', () => {
     context('when repeats is empty', () => {
       it('should return an array by length of 1', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           till: sampleDate.offsetDay(10),
@@ -86,7 +86,7 @@ describe('Event Class', () => {
       });
       it('should return an array by length of 1', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           till: sampleDate.offsetDay(10),
@@ -96,7 +96,7 @@ describe('Event Class', () => {
       });
       it('should return an array by length of 1', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           till: sampleDate.offsetDay(10),
@@ -106,7 +106,7 @@ describe('Event Class', () => {
       });
       it('should return an array by length of 0', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           till: sampleDate.offsetDay(10),
@@ -118,7 +118,7 @@ describe('Event Class', () => {
       context('when since is bigger than till', () => {
         it('should return an array by length of 1', () => {
           const event = new Event({
-            title: 'jack\'s bday',
+            title: 'The Event',
             note: 'get a cake for him',
             since: sampleDate,
             till: sampleDate.offsetDay(10),
@@ -132,7 +132,7 @@ describe('Event Class', () => {
     context('when repeats is not empty', () => {
       it('should return an array by length of 2', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           repeats: [
@@ -168,7 +168,7 @@ describe('Event Class', () => {
       });
       it('should return an array by length of 0', () => {
         const event = new Event({
-          title: 'jack\'s bday',
+          title: 'The Event',
           note: 'get a cake for him',
           since: sampleDate,
           repeats: [
@@ -288,7 +288,7 @@ describe('Event Class', () => {
   describe('collides()', () => {
     it('should return false', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
@@ -296,27 +296,59 @@ describe('Event Class', () => {
     });
     it('should return [l]', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l']);
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate)).to.deep.equal(['l']);
+    });
+    it('should return [l, c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l', 'c']);
+    });
+    it('should return [c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(3),
+      });
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['c']);
     });
     it('should return [l, r]', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r']);
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r']);
+    });
+    it('should return [l, r, c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c']);
     });
     it('should return [r]', () => {
       const event = new Event({
-        title: 'jack\'s bday',
+        title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
       expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['r']);
+    });
+    it('should return [r, c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['r', 'c']);
     });
   });
 });

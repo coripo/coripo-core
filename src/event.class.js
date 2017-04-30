@@ -109,6 +109,9 @@ const Event = function Event(config) {
     if (qSince.int() <= qEvent.till.int() && qTill.int() >= qEvent.till.int()) {
       collisions = collisions.concat(['r']);
     }
+    if (qSince.int() >= qEvent.since.int() && qTill.int() <= qEvent.till.int()) {
+      collisions = collisions.concat(['c']);
+    }
     if (collisions.length) return collisions;
     return false;
   };
