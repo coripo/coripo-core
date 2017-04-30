@@ -219,7 +219,8 @@ const Event = function Event(config) {
       overlap: events.length ? events[0].overlap : undefined,
       events,
       range: events.length ? (evts => evts
-        .concat(query(since.offsetYear(-10), till, 'event[]'))
+        .concat((overlap.external.includes('forever')) ?
+          query(since.offsetYear(-10), till, 'event[]') : [])
         .reduce((range, e) => ({
           since: e.since.int() < range.since.int() ? e.since : range.since,
           till: e.till.int() > range.till.int() ? e.till : range.till,
