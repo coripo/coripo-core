@@ -1,7 +1,3 @@
-const Event = require('./src/event.class.js').Event;
-const OneDate = require('./src/onedate.class.js').OneDate;
-const GregorianAdapter = require('./src/gregorian.adapter.js').Adapter;
-
-exports.Event = Event;
-exports.OneDate = OneDate;
-exports.GregorianAdapter = GregorianAdapter;
+exports.Event = require('./lib/event.class.js').Event;
+exports.OneDate = require('./lib/onedate.class.js').OneDate;
+exports.GregorianAdapter = require('./lib/gregorian.adapter.js').Adapter;

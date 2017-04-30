@@ -1,9 +1,15 @@
 {
   "name": "coripo-core",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Coripo Core",
   "main": "index.js",
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
   "scripts": {
+    "build": "babel src -d lib --source-maps",
     "test": "mocha -R spec"
   },
   "repository": {
@@ -21,6 +27,8 @@
   },
   "homepage": "https://github.com/coripo/coripo-core#readme",
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.4.0",
     "chai": "^3.5.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^14.1.0",
