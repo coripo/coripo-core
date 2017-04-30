@@ -81,8 +81,8 @@ describe('Event Class', () => {
           since: sampleDate,
           till: sampleDate.offsetDay(10),
         });
-        const events = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(0));
-        expect(events).to.have.lengthOf(1);
+        const series = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(0));
+        expect(series.events).to.have.lengthOf(1);
       });
       it('should return an array by length of 1', () => {
         const event = new Event({
@@ -91,8 +91,8 @@ describe('Event Class', () => {
           since: sampleDate,
           till: sampleDate.offsetDay(10),
         });
-        const events = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(5));
-        expect(events).to.have.lengthOf(1);
+        const series = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(5));
+        expect(series.events).to.have.lengthOf(1);
       });
       it('should return an array by length of 1', () => {
         const event = new Event({
@@ -101,8 +101,8 @@ describe('Event Class', () => {
           since: sampleDate,
           till: sampleDate.offsetDay(10),
         });
-        const events = event.query(sampleDate.offsetDay(10), sampleDate.offsetDay(15));
-        expect(events).to.have.lengthOf(1);
+        const series = event.query(sampleDate.offsetDay(10), sampleDate.offsetDay(15));
+        expect(series.events).to.have.lengthOf(1);
       });
       it('should return an array by length of 0', () => {
         const event = new Event({
@@ -111,8 +111,8 @@ describe('Event Class', () => {
           since: sampleDate,
           till: sampleDate.offsetDay(10),
         });
-        const events = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(-1));
-        expect(events).to.have.lengthOf(0);
+        const series = event.query(sampleDate.offsetDay(-10), sampleDate.offsetDay(-1));
+        expect(series.events).to.have.lengthOf(0);
       });
 
       context('when since is bigger than till', () => {
@@ -123,8 +123,8 @@ describe('Event Class', () => {
             since: sampleDate,
             till: sampleDate.offsetDay(10),
           });
-          const events = event.query(sampleDate.offsetDay(11), sampleDate.offsetDay(5));
-          expect(events).to.have.lengthOf(1);
+          const series = event.query(sampleDate.offsetDay(11), sampleDate.offsetDay(5));
+          expect(series.events).to.have.lengthOf(1);
         });
       });
     });
@@ -139,8 +139,8 @@ describe('Event Class', () => {
             { times: -1, cycle: 'year', step: 1 },
           ],
         });
-        const events = event.query(sampleDate, sampleDate.offsetYear(1));
-        expect(events).to.have.lengthOf(2);
+        const series = event.query(sampleDate, sampleDate.offsetYear(1));
+        expect(series.events).to.have.lengthOf(2);
       });
       it('should return an array by length of 2', () => {
         const event = new Event({
@@ -151,8 +151,8 @@ describe('Event Class', () => {
             { times: -1, cycle: 'year', step: 4 },
           ],
         });
-        const events = event.query(sampleDate.offsetDay(1), sampleDate.offsetYear(8));
-        expect(events).to.have.lengthOf(2);
+        const series = event.query(sampleDate.offsetDay(1), sampleDate.offsetYear(8));
+        expect(series.events).to.have.lengthOf(2);
       });
       it('should return an array by length of 3', () => {
         const event = new Event({
@@ -163,8 +163,8 @@ describe('Event Class', () => {
             { times: 11, cycle: 'month', step: 1 },
           ],
         });
-        const events = event.query(sampleDate, sampleDate.offsetMonth(12));
-        expect(events).to.have.lengthOf(12);
+        const series = event.query(sampleDate, sampleDate.offsetMonth(12));
+        expect(series.events).to.have.lengthOf(12);
       });
       it('should return an array by length of 0', () => {
         const event = new Event({
@@ -175,8 +175,8 @@ describe('Event Class', () => {
             { times: 3, cycle: 'year', step: 1 },
           ],
         });
-        const events = event.query(sampleDate.offsetMonth(1), sampleDate.offsetMonth(10));
-        expect(events).to.have.lengthOf(0);
+        const series = event.query(sampleDate.offsetMonth(1), sampleDate.offsetMonth(10));
+        expect(series.events).to.have.lengthOf(0);
       });
       it('should return an array by length of 3', () => {
         const event = new Event({
@@ -188,8 +188,8 @@ describe('Event Class', () => {
             { times: -1, cycle: 'day', step: 28 },
           ],
         });
-        const events = event.query(sampleDate, sampleDate.offsetMonth(2));
-        expect(events).to.have.lengthOf(3);
+        const series = event.query(sampleDate, sampleDate.offsetMonth(2));
+        expect(series.events).to.have.lengthOf(3);
       });
     });
 
@@ -198,8 +198,7 @@ describe('Event Class', () => {
         const periodStart = new OneDate({ year: 2017, month: 4, day: 4 }, helper);
         const periodCycle = 28;
         const event = new Event({
-          title: 'menstrual cycle',
-          note: 'get some pads',
+          title: 'Period Days',
           since: periodStart,
           till: periodStart.offsetDay(4),
           repeats: [
@@ -218,9 +217,9 @@ describe('Event Class', () => {
             },
           ],
         });
-        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
-          new OneDate({ year: 2017, month: 6, day: 30 }, helper));
-        expect(events).to.have.lengthOf(11);
+        const series = event.query(new OneDate({ year: 2018, month: 4, day: 1 }, helper),
+          new OneDate({ year: 2018, month: 6, day: 30 }, helper));
+        expect(series.events).to.have.lengthOf(11);
       });
 
       it('should return an array by length of 2', () => {
@@ -242,9 +241,9 @@ describe('Event Class', () => {
             },
           ],
         });
-        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
+        const series = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
-        expect(events).to.have.lengthOf(2);
+        expect(series.events).to.have.lengthOf(2);
       });
 
       it('should return an array by length of 23', () => {
@@ -279,9 +278,9 @@ describe('Event Class', () => {
             },
           ],
         });
-        const events = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
+        const series = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
-        expect(events).to.have.lengthOf(23);
+        expect(series.events).to.have.lengthOf(23);
       });
     });
   });

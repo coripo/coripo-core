@@ -58,7 +58,7 @@ const Event = function Event(config) {
             sequels,
             since: cursor.since,
             till: cursor.till,
-          })).query(qSince, qTill));
+          })).query(qSince, qTill, 'event[]'));
         }
         cursor = {
           since: offsetDate(cursor.since, pattern.cycle, pattern.step),
@@ -93,7 +93,7 @@ const Event = function Event(config) {
         since: sequelDates.since,
         till: sequelDates.till,
       });
-      events = events.concat((realSequel).query(qSince, qTill));
+      events = events.concat((realSequel).query(qSince, qTill, 'event[]'));
     });
     return events;
   };
@@ -159,7 +159,7 @@ const Event = function Event(config) {
                   color: slave.color,
                   since: slave.since,
                   till: master.since.offsetDay(-1),
-                })).query(_since, _till)[0];
+                })).query(_since, _till, 'event[]')[0];
               } else if (collision.includes('l')) {
                 slave = (new Event({
                   id,
@@ -172,7 +172,7 @@ const Event = function Event(config) {
                   color: slave.color,
                   since: master.till.offsetDay(1),
                   till: slave.till,
-                })).query(_since, _till)[0];
+                })).query(_since, _till, 'event[]')[0];
               }
               collision = collides(slave, master.since, master.till);
             }
@@ -193,9 +193,9 @@ const Event = function Event(config) {
     return events;
   };
 
-  const query = (_since, _till) => {
-    let events = [];
-    events = events.concat(collides(undefined, _since, _till) ? [
+  const query = (_since, _till, _output) => {
+    const output = _output || 'series';
+    let events = [].concat(collides(undefined, _since, _till) ? [
       {
         id,
         generatorId,
@@ -208,11 +208,27 @@ const Event = function Event(config) {
         till,
         collides: (qsince, qtill) => collides(undefined, qsince, qtill),
       },
-    ] : []);
-    events = events.concat(getSequels(_since, _till));
-    events = events.concat(getRepeats(_since, _till));
-    events = handleOverlaps(events, _since, _till);
-    return events.sort((a, b) => a.since.int() - b.since.int());
+    ] : [])
+      .concat(getSequels(_since, _till))
+      .concat(getRepeats(_since, _till));
+    events = handleOverlaps(events, _since, _till)
+      .sort((a, b) => a.since.int() - b.since.int());
+    if (output === 'event[]') return events;
+    return {
+      generatorId: events.length ? events[0].generatorId : undefined,
+      overlap: events.length ? events[0].overlap : undefined,
+      events,
+      range: events.length ? (evts => evts
+        .concat(query(since.offsetYear(-10), till, 'event[]'))
+        .reduce((range, e) => ({
+          since: e.since.int() < range.since.int() ? e.since : range.since,
+          till: e.till.int() > range.till.int() ? e.till : range.till,
+        }), {
+          since: evts[0].since,
+          till: evts[0].till,
+        })
+      )(events) : undefined,
+    };
   };
 
   return {
