@@ -10,6 +10,7 @@ const Event = function Event(config) {
   const repeats = config.repeats || [];
   const sequels = config.sequels || [];
   const virtual = config.virtual || false;
+  const repeated = config.repeated || false;
   const priority = config.priority || 0;
   const overlap = config.overlap || {};
   overlap.internal = overlap.internal || overlapRule.ALLOW;
@@ -50,6 +51,7 @@ const Event = function Event(config) {
             id,
             generatorId,
             virtual: true,
+            repeated: true,
             overlap,
             priority: priority + (round * (index + 1) * (sequels.length + 1)),
             title,
@@ -85,6 +87,7 @@ const Event = function Event(config) {
         id,
         generatorId,
         virtual: true,
+        repeated,
         overlap,
         priority: priority + (index + 1),
         title: sequel.title || title,
@@ -152,6 +155,7 @@ const Event = function Event(config) {
                   id,
                   generatorId,
                   virtual: true,
+                  repeated,
                   overlap,
                   priority: slave.priority,
                   title: slave.title,
@@ -165,6 +169,7 @@ const Event = function Event(config) {
                   id,
                   generatorId,
                   virtual: true,
+                  repeated,
                   overlap,
                   priority: slave.priority,
                   title: slave.title,
@@ -200,6 +205,7 @@ const Event = function Event(config) {
         id,
         generatorId,
         virtual,
+        repeated,
         overlap: overlap.external,
         title,
         color,
@@ -236,6 +242,7 @@ const Event = function Event(config) {
     id,
     generatorId,
     virtual,
+    repeated,
     title,
     color,
     note,
