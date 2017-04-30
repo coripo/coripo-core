@@ -152,11 +152,11 @@ const Event = function Event(config) {
             while (collision) {
               if (collision.includes('r')) {
                 slave = (new Event({
-                  id,
-                  generatorId,
-                  virtual: true,
-                  repeated,
-                  overlap,
+                  id: slave.id,
+                  generatorId: slave.generatorId,
+                  virtual: slave.virtual,
+                  repeated: slave.repeated,
+                  overlap: slave.overlap,
                   priority: slave.priority,
                   title: slave.title,
                   note: slave.note,
@@ -166,11 +166,11 @@ const Event = function Event(config) {
                 })).query(_since, _till, 'event[]')[0];
               } else if (collision.includes('l')) {
                 slave = (new Event({
-                  id,
-                  generatorId,
-                  virtual: true,
-                  repeated,
-                  overlap,
+                  id: slave.id,
+                  generatorId: slave.generatorId,
+                  virtual: slave.virtual,
+                  repeated: slave.repeated,
+                  overlap: slave.repeated,
                   priority: slave.priority,
                   title: slave.title,
                   note: slave.note,
@@ -207,6 +207,7 @@ const Event = function Event(config) {
         virtual,
         repeated,
         overlap: overlap.external,
+        priority,
         title,
         color,
         note,
