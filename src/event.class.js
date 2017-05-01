@@ -249,7 +249,7 @@ const Event = function Event(config) {
     note,
     since,
     till,
-    overlap: overlap.external,
+    overlap,
     collides: (_since, _till) => collides(undefined, _since, _till),
     query,
   };
