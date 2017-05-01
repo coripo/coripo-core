@@ -206,7 +206,7 @@ const Event = function Event(config) {
         generatorId,
         virtual,
         repeated,
-        overlap: overlap.external,
+        overlap,
         priority,
         title,
         color,
