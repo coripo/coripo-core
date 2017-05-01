@@ -1,6 +1,6 @@
 {
   "name": "coripo-core",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "description": "Coripo Core",
   "main": "index.js",
   "babel": {
