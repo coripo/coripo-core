@@ -1,33 +1,33 @@
-const Adapter = function Adapter() {
-  const id = 'coripo.coripo.adapter.gregorian';
-  const name = 'Gregorian';
-  const description = 'The Gregorian calendar is internationally the most widely used civil calendar.';
+const i18next = require('i18next');
+const locales = require('../locales/index.js');
 
-  const months = [
-    { name: 'January', short: 'Jan' },
-    { name: 'February', short: 'Feb' },
-    { name: 'March', short: 'Mar' },
-    { name: 'April', short: 'Apr' },
-    { name: 'May', short: 'May' },
-    { name: 'June', short: 'Jun' },
-    { name: 'July', short: 'Jul' },
-    { name: 'August', short: 'Aug' },
-    { name: 'September', short: 'Sept' },
-    { name: 'October', short: 'Oct' },
-    { name: 'November', short: 'Nov' },
-    { name: 'December', short: 'Dec' },
-  ];
+const Adapter = function Adapter(config = {}) {
+  i18next.init({
+    lng: config.locale || 'en',
+    fallbackLng: 'en',
+    initImmediate: false,
+    resources: locales,
+  });
+  const trl = (key) => {
+    i18next.store.data = locales;
+    return i18next.t(key);
+  };
+  const id = 'coripo.coripo.adapter.gregorian';
+  const name = trl('gregorian-adapter.name');
+  const description = trl('gregorian-adapter.description');
 
   const l10n = date => date;
 
   const i18n = ldate => ldate;
 
   const getMonthName = (month, short) => {
-    const mon = (months[month - 1]);
-    if (typeof mon === 'undefined') {
+    const shortNameKey = `gregorian-adapter.months.${month}.short`;
+    const fullNameKey = `gregorian-adapter.months.${month}.name`;
+    const string = short ? trl(shortNameKey) : trl(fullNameKey);
+    if (string === shortNameKey || string === fullNameKey) {
       throw new Error('Invalid month number, number should be between 1 and 12');
     }
-    return short ? mon.short : mon.name;
+    return string;
   };
 
   const getMonthLength = (year, month) => new Date(year, month, 0).getDate();

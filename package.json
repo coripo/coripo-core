@@ -1,6 +1,6 @@
 {
   "name": "coripo-core",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Coripo Core",
   "main": "index.js",
   "babel": {
@@ -36,5 +36,8 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "mocha": "^3.3.0"
+  },
+  "dependencies": {
+    "i18next": "^8.1.0"
   }
 }
