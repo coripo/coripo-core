@@ -1,11 +1,13 @@
 const Event = function Event(config) {
-  const id = config.id || 0;
-  const generatorId = config.generatorId || 'unknown';
+  const id = config.id;
   const title = config.title;
-  const color = config.color || '#000000';
-  const note = config.note || '';
   const since = config.since;
   const till = config.till || config.since;
+  const generatorId = config.generatorId || 'coripo.coripo.generator.handmade';
+  const color = config.color || undefined;
+  const icon = config.icon || undefined;
+  const image = config.image || undefined;
+  const note = config.note || '';
   const repeats = config.repeats || [];
   const sequels = config.sequels || [];
   const virtual = config.virtual || false;
@@ -15,6 +17,7 @@ const Event = function Event(config) {
     internal: ((config.overlap || {}).internal || 'allow'),
     external: ((config.overlap || {}).external || 'allow'),
   };
+  let getPublicObject;
 
   const offsetDate = (date, scale, step) => {
     switch (scale) {
@@ -147,33 +150,13 @@ const Event = function Event(config) {
           let collision = collides(slave, master.since, master.till);
           while (collision) {
             if (collision.includes('r')) {
-              slave = (new Event({
-                id: slave.id,
-                generatorId: slave.generatorId,
-                virtual: slave.virtual,
-                repeated: slave.repeated,
-                overlap: slave.overlap,
-                priority: slave.priority,
-                title: slave.title,
-                note: slave.note,
-                color: slave.color,
-                since: slave.since,
+              slave = (new Event(Object.assign({}, slave, {
                 till: master.since.offsetDay(-1),
-              })).query(_since, _till, 'event[]')[0];
+              }))).query(_since, _till, 'event[]')[0];
             } else if (collision.includes('l')) {
-              slave = (new Event({
-                id: slave.id,
-                generatorId: slave.generatorId,
-                virtual: slave.virtual,
-                repeated: slave.repeated,
-                overlap: slave.overlap,
-                priority: slave.priority,
-                title: slave.title,
-                note: slave.note,
-                color: slave.color,
+              slave = (new Event(Object.assign({}, slave, {
                 since: master.till.offsetDay(1),
-                till: slave.till,
-              })).query(_since, _till, 'event[]')[0];
+              }))).query(_since, _till, 'event[]')[0];
             }
             collision = collides(slave, master.since, master.till);
           }
@@ -188,22 +171,7 @@ const Event = function Event(config) {
 
   const query = (_since, _till, _output) => {
     const output = _output || 'series';
-    let events = [].concat(collides(undefined, _since, _till) ? [
-      {
-        id,
-        generatorId,
-        virtual,
-        repeated,
-        overlap,
-        priority,
-        title,
-        color,
-        note,
-        since,
-        till,
-        collides: (qsince, qtill) => collides(undefined, qsince, qtill),
-      },
-    ] : [])
+    let events = [].concat(collides(undefined, _since, _till) ? [getPublicObject()] : [])
       .concat(getSequels(_since, _till))
       .concat(getRepeats(_since, _till));
     events = handleOverlaps(events, _since, _till)
@@ -227,20 +195,25 @@ const Event = function Event(config) {
     };
   };
 
-  return {
+  getPublicObject = () => ({
     id,
     generatorId,
     virtual,
     repeated,
+    priority,
+    overlap,
     title,
     color,
+    icon,
+    image,
     note,
     since,
     till,
-    overlap,
-    collides: (_since, _till) => collides(undefined, _since, _till),
+    collides: (qsince, qtill) => collides(undefined, qsince, qtill),
     query,
-  };
+  });
+
+  return getPublicObject();
 };
 
 exports.Event = Event;

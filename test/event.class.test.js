@@ -17,58 +17,70 @@ describe('Event Class', () => {
     adapterId: GREGORIAN_ADAPTER_ID,
   }, helper);
 
-  describe('title', () => {
-    it('should return string', () => {
+  describe('collides()', () => {
+    it('should return false', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
+        till: sampleDate.offsetDay(2),
       });
-      expect(event.title).to.be.a('string');
+      expect(event.collides(sampleDate.offsetDay(3), sampleDate.offsetDay(4))).to.be.false;
     });
-  });
-
-  describe('color', () => {
-    it('should return string', () => {
+    it('should return [l]', () => {
       const event = new Event({
         title: 'The Event',
-        color: '#f811f8',
         since: sampleDate,
+        till: sampleDate.offsetDay(2),
       });
-      expect(event.color).to.be.a('string');
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate)).to.deep.equal(['l']);
     });
-  });
-
-  describe('note', () => {
-    it('should return string', () => {
+    it('should return [l, c]', () => {
       const event = new Event({
         title: 'The Event',
-        note: 'get a cake for him',
         since: sampleDate,
+        till: sampleDate.offsetDay(2),
       });
-      expect(event.note).to.be.a('string');
+      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l', 'c']);
     });
-  });
-
-  describe('since', () => {
-    it('should return OneDate', () => {
+    it('should return [c]', () => {
       const event = new Event({
         title: 'The Event',
-        note: 'get a cake for him',
         since: sampleDate,
+        till: sampleDate.offsetDay(3),
       });
-      expect(event.since).to.deep.equal(sampleDate);
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['c']);
     });
-  });
-
-  describe('till', () => {
-    it('should return 20171015', () => {
+    it('should return [l, r]', () => {
       const event = new Event({
         title: 'The Event',
-        note: 'get a cake for him',
         since: sampleDate,
-        till: sampleDate.offsetDay(10),
+        till: sampleDate.offsetDay(2),
       });
-      expect(event.till.int()).to.equal(sampleDate.offsetDay(10).int());
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r']);
+    });
+    it('should return [l, r, c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c']);
+    });
+    it('should return [r]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['r']);
+    });
+    it('should return [r, c]', () => {
+      const event = new Event({
+        title: 'The Event',
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['r', 'c']);
     });
   });
 
@@ -282,72 +294,6 @@ describe('Event Class', () => {
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
         expect(series.events).to.have.lengthOf(23);
       });
-    });
-  });
-  describe('collides()', () => {
-    it('should return false', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate.offsetDay(3), sampleDate.offsetDay(4))).to.be.false;
-    });
-    it('should return [l]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate.offsetDay(-1), sampleDate)).to.deep.equal(['l']);
-    });
-    it('should return [l, c]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l', 'c']);
-    });
-    it('should return [c]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(3),
-      });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['c']);
-    });
-    it('should return [l, r]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r']);
-    });
-    it('should return [l, r, c]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c']);
-    });
-    it('should return [r]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['r']);
-    });
-    it('should return [r, c]', () => {
-      const event = new Event({
-        title: 'The Event',
-        since: sampleDate,
-        till: sampleDate.offsetDay(2),
-      });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['r', 'c']);
     });
   });
 });
