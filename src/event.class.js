@@ -7,6 +7,8 @@ const Event = function Event(config) {
   const color = config.color || undefined;
   const icon = config.icon || undefined;
   const image = config.image || undefined;
+  const categoryId = config.categoryId || undefined;
+  const tags = config.tags || [];
   const note = config.note || '';
   const repeats = config.repeats || [];
   const sequels = config.sequels || [];
@@ -206,6 +208,8 @@ const Event = function Event(config) {
     color,
     icon,
     image,
+    categoryId,
+    tags,
     note,
     since,
     till,
