@@ -19,7 +19,9 @@ const Event = function Event(config) {
     internal: ((config.overlap || {}).internal || 'allow'),
     external: ((config.overlap || {}).external || 'allow'),
   };
-  let getPublicObject;
+  let getPublicObject = () => { };
+  let getPrivateObject = () => { };
+  let collides = () => { };
 
   const offsetDate = (date, scale, step) => {
     switch (scale) {
@@ -38,6 +40,10 @@ const Event = function Event(config) {
     }
   };
 
+  const getEstimatedRange = (event) => {
+
+  };
+
   const getRange = evts => evts.reduce((range, e) => ({
     since: e.since.int() < range.since.int() ? e.since : range.since,
     till: e.till.int() > range.till.int() ? e.till : range.till,
@@ -46,17 +52,14 @@ const Event = function Event(config) {
   const getRepeats = (_since, _till) => {
     const qSince = (_till.int() <= _since.int()) ? _till : _since;
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
-    let events = [];
 
-    repeats.forEach((pattern, index) => {
+    return repeats.reduce((events, pattern, index) => {
+      let evts = [];
       let times = pattern.times;
       let round = 1;
       let cursor = { since, till };
       let range = { since, till };
-      /*
-        im not sure if this loop always does the job right
-        but i cant put more time on it for now
-      */
+
       do {
         cursor = {
           since: offsetDate(cursor.since, pattern.cycle, pattern.step),
@@ -66,72 +69,61 @@ const Event = function Event(config) {
           since: offsetDate(range.since, pattern.cycle, pattern.step),
           till: offsetDate(range.till, pattern.cycle, pattern.step),
         };
-        events = events.concat((new Event({
-          id,
-          generatorId,
+        evts = evts.concat(new Event(Object.assign({}, getPrivateObject(), {
           virtual: true,
           repeated: true,
-          overlap,
           priority: priority + (round * (index + 1) * (sequels.length + 1)),
-          title,
-          color,
-          note,
-          sequels,
           since: cursor.since,
           till: cursor.till,
+          repeats: [],
         })).query(qSince, qTill, 'event[]'));
         round += 1;
         times -= 1;
       } while (times !== 0 && range.since.int() <= qTill.int());
-    });
-    return events;
+      return events.concat(evts);
+    }, []);
   };
 
   const getSequels = (_since, _till) => {
     const qSince = (_till.int() <= _since.int()) ? _till : _since;
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
-    let events = [];
 
-    sequels.forEach((sequel, index) => {
+    return sequels.reduce((events, sequel, index) => {
       const sequelDates = {
         since: offsetDate(since, sequel.since.scale, sequel.since.offset),
         till: offsetDate(since, sequel.till.scale, sequel.till.offset),
       };
-      const realSequel = new Event({
-        id,
-        generatorId,
+      if ((!sequel.repeats || !sequel.repeats.length) &&
+        !collides({
+          since: sequelDates.since,
+          till: sequelDates.till,
+        }, qSince, qTill)) return events;
+
+      const realSequel = new Event(Object.assign({}, getPrivateObject(), {
         virtual: true,
-        repeated,
-        overlap,
         priority: priority + (index + 1),
-        title: sequel.title || title,
-        note: sequel.note || note,
-        color: sequel.color || color,
+        title: sequel.title,
+        note: sequel.note,
+        color: sequel.color,
         since: sequelDates.since,
         till: sequelDates.till,
-      });
-      events = events.concat((realSequel).query(qSince, qTill, 'event[]'));
-    });
-    return events;
+        repeats: sequel.repeats,
+        sequels: [],
+      }));
+      return events.concat((realSequel).query(qSince, qTill, 'event[]'));
+    }, []);
   };
 
-  const collides = (event, _since, _till) => {
-    const qEvent = event || { since, till };
-    const qSince = (_till.int() <= _since.int()) ? _till : _since;
-    const qTill = (_since.int() >= _till.int()) ? _since : _till;
-    let collisions = [];
-    if (qSince.int() <= qEvent.since.int() && qTill.int() >= qEvent.since.int()) {
-      collisions = collisions.concat(['l']);
-    }
-    if (qSince.int() <= qEvent.till.int() && qTill.int() >= qEvent.till.int()) {
-      collisions = collisions.concat(['r']);
-    }
-    if (qSince.int() >= qEvent.since.int() && qTill.int() <= qEvent.till.int()) {
-      collisions = collisions.concat(['c']);
-    }
-    if (qSince.int() <= qEvent.since.int() && qTill.int() >= qEvent.till.int()) {
-      collisions = collisions.concat(['i']);
-    }
+  collides = (event, _since, _till) => {
+    const qs = (_till.int() <= _since.int() ? _till : _since).int();
+    const qt = (_since.int() >= _till.int() ? _since : _till).int();
+    const es = (event || { since, till }).since.int();
+    const et = (event || { since, till }).till.int();
+    const collisions = []
+      .concat((qs <= es && qt >= es) ? ['l'] : [])
+      .concat((qs <= et && qt >= et) ? ['r'] : [])
+      .concat((qs >= es && qt <= et) ? ['c'] : [])
+      .concat((qs <= es && qt >= et) ? ['i'] : []);
     if (collisions.length) return collisions;
     return false;
   };
@@ -221,6 +213,11 @@ const Event = function Event(config) {
     till,
     collides: (qsince, qtill) => collides(undefined, qsince, qtill),
     query,
+  });
+
+  getPrivateObject = () => Object.assign({}, getPublicObject, {
+    sequels,
+    repeats,
   });
 
   return getPublicObject();
