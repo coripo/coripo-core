@@ -56,7 +56,7 @@ describe('Event Class', () => {
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r']);
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r', 'i']);
     });
     it('should return [l, r, c]', () => {
       const event = new Event({
@@ -64,7 +64,7 @@ describe('Event Class', () => {
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c']);
+      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c', 'i']);
     });
     it('should return [r]', () => {
       const event = new Event({
@@ -293,6 +293,42 @@ describe('Event Class', () => {
         const series = event.query(new OneDate({ year: 2017, month: 4, day: 1 }, helper),
           new OneDate({ year: 2017, month: 6, day: 30 }, helper));
         expect(series.events).to.have.lengthOf(23);
+      });
+      it('should return an array of 1', () => {
+        const periodStart = new OneDate({ year: 2017, month: 4, day: 23 }, helper);
+        const periodLength = 5;
+        const cycleLength = 28;
+        const event = new Event({
+          title: 'Period Days',
+          color: '#ee10f6',
+          since: periodStart,
+          till: periodStart.offsetDay(periodLength - 1),
+          overlap: { internal: 'trim' },
+          repeats: [{ times: -1, cycle: 'day', step: cycleLength }],
+          sequels: [
+            {
+              title: 'Peak Ovulation',
+              color: '#00aeef',
+              since: { scale: 'day', offset: 10 },
+              till: { scale: 'day', offset: 14 },
+            },
+            {
+              title: 'Pre-Period',
+              color: '#f36',
+              since: { scale: 'day', offset: -2 },
+              till: { scale: 'day', offset: -1 },
+            },
+            {
+              title: 'Post-Period',
+              color: '#7e70ff',
+              since: { scale: 'day', offset: periodLength },
+              till: { scale: 'day', offset: periodLength + 1 },
+            },
+          ],
+        });
+        const series = event.query(new OneDate({ year: 2017, month: 5, day: 19 }, helper),
+          new OneDate({ year: 2017, month: 5, day: 19 }, helper));
+        expect(series.events).to.have.lengthOf(1);
       });
     });
   });

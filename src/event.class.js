@@ -38,6 +38,11 @@ const Event = function Event(config) {
     }
   };
 
+  const getRange = evts => evts.reduce((range, e) => ({
+    since: e.since.int() < range.since.int() ? e.since : range.since,
+    till: e.till.int() > range.till.int() ? e.till : range.till,
+  }), { since: evts[0].since, till: evts[0].till });
+
   const getRepeats = (_since, _till) => {
     const qSince = (_till.int() <= _since.int()) ? _till : _since;
     const qTill = (_since.int() >= _till.int()) ? _since : _till;
@@ -46,12 +51,22 @@ const Event = function Event(config) {
     repeats.forEach((pattern, index) => {
       let times = pattern.times;
       let round = 1;
-      let cursor = {
-        since: offsetDate(since, pattern.cycle, pattern.step),
-        till: offsetDate(till, pattern.cycle, pattern.step),
-      };
-      while (times !== 0 && cursor.since.int() <= qTill.int()) {
-        if (cursor.since.int() >= qSince.int()) {
+      let cursor = { since, till };
+      let range = { since, till };
+      /*
+        im not sure if this loop always does the job right
+        but i cant put more time on it for now
+      */
+      do {
+        cursor = {
+          since: offsetDate(cursor.since, pattern.cycle, pattern.step),
+          till: offsetDate(cursor.till, pattern.cycle, pattern.step),
+        };
+        range = {
+          since: offsetDate(range.since, pattern.cycle, pattern.step),
+          till: offsetDate(range.till, pattern.cycle, pattern.step),
+        };
+        if (range.since.int() >= qSince.int()) {
           events = events.concat((new Event({
             id,
             generatorId,
@@ -67,13 +82,9 @@ const Event = function Event(config) {
             till: cursor.till,
           })).query(qSince, qTill, 'event[]'));
         }
-        cursor = {
-          since: offsetDate(cursor.since, pattern.cycle, pattern.step),
-          till: offsetDate(cursor.till, pattern.cycle, pattern.step),
-        };
         round += 1;
         times -= 1;
-      }
+      } while (times !== 0 && range.since.int() <= qTill.int());
     });
     return events;
   };
@@ -119,6 +130,9 @@ const Event = function Event(config) {
     }
     if (qSince.int() >= qEvent.since.int() && qTill.int() <= qEvent.till.int()) {
       collisions = collisions.concat(['c']);
+    }
+    if (qSince.int() <= qEvent.since.int() && qTill.int() >= qEvent.till.int()) {
+      collisions = collisions.concat(['i']);
     }
     if (collisions.length) return collisions;
     return false;
@@ -183,17 +197,11 @@ const Event = function Event(config) {
       generatorId: events.length ? events[0].generatorId : undefined,
       overlap: events.length ? events[0].overlap : undefined,
       events,
-      range: events.length ? (evts => evts
-        .concat((overlap.external.includes('forever')) ?
-          query(since.offsetYear(-10), till, 'event[]') : [])
-        .reduce((range, e) => ({
-          since: e.since.int() < range.since.int() ? e.since : range.since,
-          till: e.till.int() > range.till.int() ? e.till : range.till,
-        }), {
-          since: evts[0].since,
-          till: evts[0].till,
-        })
-      )(events) : undefined,
+      range: events.length ?
+        getRange(events
+          .concat((overlap.external.includes('forever')) ?
+            query(since.offsetYear(-10), till, 'event[]') : [])) :
+        undefined,
     };
   };
 
