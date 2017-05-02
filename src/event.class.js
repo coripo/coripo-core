@@ -1,5 +1,4 @@
 const Event = function Event(config) {
-  const overlapRule = { ALLOW: 'allow', TRIM: 'trim', REMOVE: 'remove', SPLIT: 'split' };
   const id = config.id || 0;
   const generatorId = config.generatorId || 'unknown';
   const title = config.title;
@@ -12,9 +11,10 @@ const Event = function Event(config) {
   const virtual = config.virtual || false;
   const repeated = config.repeated || false;
   const priority = config.priority || 0;
-  const overlap = config.overlap || {};
-  overlap.internal = overlap.internal || overlapRule.ALLOW;
-  overlap.external = overlap.external || overlapRule.ALLOW;
+  const overlap = {
+    internal: ((config.overlap || {}).internal || 'allow'),
+    external: ((config.overlap || {}).external || 'allow'),
+  };
 
   const offsetDate = (date, scale, step) => {
     switch (scale) {
@@ -120,79 +120,67 @@ const Event = function Event(config) {
   };
 
   const handleOverlaps = (_events, _since, _till) => {
-    let events = _events;
-    switch (overlap.internal) {
-      case overlapRule.ALLOW: {
-        break;
-      }
-      case overlapRule.REMOVE: {
-        events = events.reduce((evts, event) => {
-          const parallels = evts
-            .filter(evt => evt.virtual && collides(event, evt.since, evt.till))
-            .sort((a, b) => b.priority - a.priority);
-          if (!parallels.length) return evts.concat([event]);
-          const items = evts
-            .filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
-          return items.concat([parallels[0]]);
-        }, []);
-        break;
-      }
-      case overlapRule.TRIM: {
-        events = events.reduce((evts, event) => {
-          const parallels = evts.filter(evt => evt.virtual && collides(event, evt.since, evt.till));
-          if (!parallels.length) return evts.concat([event]);
-          let items = evts.filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
-          const conflicts = parallels.concat([event]).sort((a, b) => b.priority - a.priority);
-          const master = conflicts[0];
-          const slaves = conflicts.slice(1);
-          items = items.concat([master]);
-          const trimmedSlaves = slaves.map((evt) => {
-            let slave = evt;
-            let collision = collides(slave, master.since, master.till);
-            while (collision) {
-              if (collision.includes('r')) {
-                slave = (new Event({
-                  id: slave.id,
-                  generatorId: slave.generatorId,
-                  virtual: slave.virtual,
-                  repeated: slave.repeated,
-                  overlap: slave.overlap,
-                  priority: slave.priority,
-                  title: slave.title,
-                  note: slave.note,
-                  color: slave.color,
-                  since: slave.since,
-                  till: master.since.offsetDay(-1),
-                })).query(_since, _till, 'event[]')[0];
-              } else if (collision.includes('l')) {
-                slave = (new Event({
-                  id: slave.id,
-                  generatorId: slave.generatorId,
-                  virtual: slave.virtual,
-                  repeated: slave.repeated,
-                  overlap: slave.overlap,
-                  priority: slave.priority,
-                  title: slave.title,
-                  note: slave.note,
-                  color: slave.color,
-                  since: master.till.offsetDay(1),
-                  till: slave.till,
-                })).query(_since, _till, 'event[]')[0];
-              }
-              collision = collides(slave, master.since, master.till);
+    const events = _events;
+    if (overlap.internal === 'allow') return events;
+    if (overlap.internal === 'remove') {
+      return events.reduce((evts, event) => {
+        const parallels = evts
+          .filter(evt => evt.virtual && collides(event, evt.since, evt.till))
+          .sort((a, b) => b.priority - a.priority);
+        if (!parallels.length) return evts.concat([event]);
+        const items = evts
+          .filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
+        return items.concat([parallels[0]]);
+      }, []);
+    }
+    if (overlap.internal === 'trim') {
+      return events.reduce((evts, event) => {
+        const parallels = evts.filter(evt => evt.virtual && collides(event, evt.since, evt.till));
+        if (!parallels.length) return evts.concat([event]);
+        let items = evts.filter(evt => !(evt.virtual && collides(event, evt.since, evt.till)));
+        const conflicts = parallels.concat([event]).sort((a, b) => b.priority - a.priority);
+        const master = conflicts[0];
+        const slaves = conflicts.slice(1);
+        items = items.concat([master]);
+        const trimmedSlaves = slaves.map((evt) => {
+          let slave = evt;
+          let collision = collides(slave, master.since, master.till);
+          while (collision) {
+            if (collision.includes('r')) {
+              slave = (new Event({
+                id: slave.id,
+                generatorId: slave.generatorId,
+                virtual: slave.virtual,
+                repeated: slave.repeated,
+                overlap: slave.overlap,
+                priority: slave.priority,
+                title: slave.title,
+                note: slave.note,
+                color: slave.color,
+                since: slave.since,
+                till: master.since.offsetDay(-1),
+              })).query(_since, _till, 'event[]')[0];
+            } else if (collision.includes('l')) {
+              slave = (new Event({
+                id: slave.id,
+                generatorId: slave.generatorId,
+                virtual: slave.virtual,
+                repeated: slave.repeated,
+                overlap: slave.overlap,
+                priority: slave.priority,
+                title: slave.title,
+                note: slave.note,
+                color: slave.color,
+                since: master.till.offsetDay(1),
+                till: slave.till,
+              })).query(_since, _till, 'event[]')[0];
             }
-            return slave;
-          }).filter(evt => evt.till.int() - evt.since.int() >= 0);
-          return items.concat(trimmedSlaves);
-        }, []);
-        break;
-      }
-      case overlapRule.SPLIT: {
-        // TODO
-        break;
-      }
-      default:
-        break;
+            collision = collides(slave, master.since, master.till);
+          }
+          return slave;
+        }).filter(evt => evt.till.int() - evt.since.int() >= 0);
+        return items.concat(trimmedSlaves);
+      }, []);
     }
 
     return events;
