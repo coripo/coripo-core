@@ -66,22 +66,20 @@ const Event = function Event(config) {
           since: offsetDate(range.since, pattern.cycle, pattern.step),
           till: offsetDate(range.till, pattern.cycle, pattern.step),
         };
-        if (range.since.int() >= qSince.int()) {
-          events = events.concat((new Event({
-            id,
-            generatorId,
-            virtual: true,
-            repeated: true,
-            overlap,
-            priority: priority + (round * (index + 1) * (sequels.length + 1)),
-            title,
-            color,
-            note,
-            sequels,
-            since: cursor.since,
-            till: cursor.till,
-          })).query(qSince, qTill, 'event[]'));
-        }
+        events = events.concat((new Event({
+          id,
+          generatorId,
+          virtual: true,
+          repeated: true,
+          overlap,
+          priority: priority + (round * (index + 1) * (sequels.length + 1)),
+          title,
+          color,
+          note,
+          sequels,
+          since: cursor.since,
+          till: cursor.till,
+        })).query(qSince, qTill, 'event[]'));
         round += 1;
         times -= 1;
       } while (times !== 0 && range.since.int() <= qTill.int());
