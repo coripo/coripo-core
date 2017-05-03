@@ -40,8 +40,18 @@ const Event = function Event(config) {
     }
   };
 
-  const getEstimatedRange = (event) => {
-
+  collides = (event, _since, _till) => {
+    const qs = (_till.int() <= _since.int() ? _till : _since).int();
+    const qt = (_since.int() >= _till.int() ? _since : _till).int();
+    const es = (event || { since, till }).since.int();
+    const et = (event || { since, till }).till.int();
+    const collisions = []
+      .concat((qs <= es && qt >= es) ? ['l'] : [])
+      .concat((qs <= et && qt >= et) ? ['r'] : [])
+      .concat((qs >= es && qt <= et) ? ['c'] : [])
+      .concat((qs <= es && qt >= et) ? ['i'] : []);
+    if (collisions.length) return collisions;
+    return false;
   };
 
   const getRange = evts => evts.reduce((range, e) => ({
@@ -112,20 +122,6 @@ const Event = function Event(config) {
       }));
       return events.concat((realSequel).query(qSince, qTill, 'event[]'));
     }, []);
-  };
-
-  collides = (event, _since, _till) => {
-    const qs = (_till.int() <= _since.int() ? _till : _since).int();
-    const qt = (_since.int() >= _till.int() ? _since : _till).int();
-    const es = (event || { since, till }).since.int();
-    const et = (event || { since, till }).till.int();
-    const collisions = []
-      .concat((qs <= es && qt >= es) ? ['l'] : [])
-      .concat((qs <= et && qt >= et) ? ['r'] : [])
-      .concat((qs >= es && qt <= et) ? ['c'] : [])
-      .concat((qs <= es && qt >= et) ? ['i'] : []);
-    if (collisions.length) return collisions;
-    return false;
   };
 
   const handleOverlaps = (_events, _since, _till) => {
@@ -215,7 +211,7 @@ const Event = function Event(config) {
     query,
   });
 
-  getPrivateObject = () => Object.assign({}, getPublicObject, {
+  getPrivateObject = () => Object.assign({}, getPublicObject(), {
     sequels,
     repeats,
   });
