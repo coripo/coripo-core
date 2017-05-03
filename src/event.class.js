@@ -1,5 +1,5 @@
-const Event = function Event(_config) {
-  const config = _config;
+const Event = function Event(config) {
+  const dna = config.dna;
   const id = config.id;
   const title = config.title;
   const since = config.since;
@@ -193,7 +193,7 @@ const Event = function Event(_config) {
   };
 
   getPublicObject = () => ({
-    config,
+    dna,
     id,
     generatorId,
     virtual,
