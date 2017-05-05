@@ -47,10 +47,10 @@ const Event = function Event(config) {
     const es = (event || { since, till }).since.int();
     const et = (event || { since, till }).till.int();
     const collisions = []
-      .concat((qs <= es && qt >= es) ? ['l'] : [])
-      .concat((qs <= et && qt >= et) ? ['r'] : [])
-      .concat((qs >= es && qt <= et) ? ['c'] : [])
-      .concat((qs <= es && qt >= et) ? ['i'] : []);
+      .concat((qs <= es && qt >= es) ? ['left'] : [])
+      .concat((qs <= et && qt >= et) ? ['right'] : [])
+      .concat((qs > es && qt < et) ? ['inside'] : [])
+      .concat((qs < es && qt > et) ? ['outside'] : []);
     if (collisions.length) return collisions;
     return false;
   };
@@ -152,11 +152,11 @@ const Event = function Event(config) {
           let slave = evt;
           let collision = collides(slave, master.since, master.till);
           while (collision) {
-            if (collision.includes('r')) {
+            if (collision.includes('right')) {
               slave = (new Event(Object.assign({}, slave, {
                 till: master.since.offsetDay(-1),
               }))).query(_since, _till, 'event[]')[0];
-            } else if (collision.includes('l')) {
+            } else if (collision.includes('left')) {
               slave = (new Event(Object.assign({}, slave, {
                 since: master.till.offsetDay(1),
               }))).query(_since, _till, 'event[]')[0];

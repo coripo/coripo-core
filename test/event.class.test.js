@@ -26,61 +26,63 @@ describe('Event Class', () => {
       });
       expect(event.collides(sampleDate.offsetDay(3), sampleDate.offsetDay(4))).to.be.false;
     });
-    it('should return [l]', () => {
+    it('should return [left]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate.offsetDay(-1), sampleDate)).to.deep.equal(['l']);
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate)).to.deep.equal(['left']);
     });
-    it('should return [l, c]', () => {
+    it('should return [left]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['l', 'c']);
+      expect(event.collides(sampleDate, sampleDate)).to.deep.equal(['left']);
     });
-    it('should return [c]', () => {
+    it('should return [inside]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(3),
       });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['c']);
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['inside']);
     });
-    it('should return [l, r]', () => {
+    it('should return [left, right]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3))).to.deep.equal(['l', 'r', 'i']);
+      expect(event.collides(sampleDate, sampleDate.offsetDay(2)))
+        .to.deep.equal(['left', 'right']);
     });
-    it('should return [l, r, c]', () => {
+    it('should return [left, right, outside]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate, sampleDate.offsetDay(2))).to.deep.equal(['l', 'r', 'c', 'i']);
+      expect(event.collides(sampleDate.offsetDay(-1), sampleDate.offsetDay(3)))
+        .to.deep.equal(['left', 'right', 'outside']);
     });
-    it('should return [r]', () => {
+    it('should return [right]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['r']);
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(3))).to.deep.equal(['right']);
     });
-    it('should return [r, c]', () => {
+    it('should return [right]', () => {
       const event = new Event({
         title: 'The Event',
         since: sampleDate,
         till: sampleDate.offsetDay(2),
       });
-      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['r', 'c']);
+      expect(event.collides(sampleDate.offsetDay(1), sampleDate.offsetDay(2))).to.deep.equal(['right']);
     });
   });
 
