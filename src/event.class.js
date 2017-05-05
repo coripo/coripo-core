@@ -152,8 +152,9 @@ const Event = function Event(config) {
           let slave = evt;
           let col = collides(slave, master.since, master.till);
           while (col) {
-            if (col.includes('outside') ||
-              (col.includes('left') && col.includes('right'))) {
+            if (col.includes('outside')) {
+              slave = undefined;
+            } else if (col.includes('left') && col.includes('right')) {
               slave = undefined;
             } else if (col.includes('right')) {
               slave = (new Event(Object.assign({}, slave, {
