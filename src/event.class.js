@@ -221,4 +221,4 @@ const Event = function Event(config) {
   return getPublicObject();
 };
 
-exports.Event = Event;
+module.exports = Event;

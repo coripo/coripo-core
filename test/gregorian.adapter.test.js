@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 const expect = require('chai').expect;
-const GregorianAdapter = require('../src/gregorian.adapter.js').Adapter;
+const GregorianAdapter = require('../src/gregorian.adapter.js');
 
 describe('Gregorian Adapter', () => {
   const gregorianAdapter = new GregorianAdapter();

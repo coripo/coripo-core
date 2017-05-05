@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-expressions */
 const expect = require('chai').expect;
-const GregorianAdapter = require('../src/gregorian.adapter.js').Adapter;
-const OneDate = require('../src/onedate.class.js').OneDate;
-const Event = require('../src/event.class.js').Event;
+const GregorianAdapter = require('../src/gregorian.adapter.js');
+const OneDate = require('../src/onedate.class.js');
+const Event = require('../src/event.class.js');
 
 describe('Event Class', () => {
   const GREGORIAN_ADAPTER_ID = new GregorianAdapter().id;

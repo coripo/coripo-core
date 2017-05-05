@@ -1,3 +1,3 @@
-exports.Event = require('./lib/event.class.js').Event;
-exports.OneDate = require('./lib/onedate.class.js').OneDate;
-exports.GregorianAdapter = require('./lib/gregorian.adapter.js').Adapter;
+exports.Event = require('./lib/event.class.js');
+exports.OneDate = require('./lib/onedate.class.js');
+exports.GregorianAdapter = require('./lib/gregorian.adapter.js');

@@ -88,4 +88,4 @@ const Adapter = function Adapter(config = {}) {
   };
 };
 
-exports.Adapter = Adapter;
+module.exports = Adapter;

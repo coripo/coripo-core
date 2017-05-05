@@ -58,4 +58,4 @@ const OneDate = function OneDate(config, helper) {
   return { year, month, day, int, offsetYear, offsetMonth, offsetDay };
 };
 
-exports.OneDate = OneDate;
+module.exports = OneDate;
