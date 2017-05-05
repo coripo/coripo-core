@@ -150,21 +150,28 @@ const Event = function Event(config) {
         items = items.concat([master]);
         const trimmedSlaves = slaves.map((evt) => {
           let slave = evt;
-          let collision = collides(slave, master.since, master.till);
-          while (collision) {
-            if (collision.includes('right')) {
+          let col = collides(slave, master.since, master.till);
+          while (col) {
+            if (col.includes('outside') ||
+              (col.includes('left') && col.includes('right'))) {
+              slave = undefined;
+            } else if (col.includes('right')) {
               slave = (new Event(Object.assign({}, slave, {
                 till: master.since.offsetDay(-1),
               }))).query(_since, _till, 'event[]')[0];
-            } else if (collision.includes('left')) {
+            } else if (col.includes('left')) {
               slave = (new Event(Object.assign({}, slave, {
                 since: master.till.offsetDay(1),
               }))).query(_since, _till, 'event[]')[0];
+            } else if (col.includes('inside')) {
+              slave = (new Event(Object.assign({}, slave, {
+                till: master.since.offsetDay(-1),
+              }))).query(_since, _till, 'event[]')[0];
             }
-            collision = collides(slave, master.since, master.till);
+            col = slave ? collides(slave, master.since, master.till) : false;
           }
           return slave;
-        }).filter(evt => evt.till.int() - evt.since.int() >= 0);
+        }).filter(evt => evt !== undefined);
         return items.concat(trimmedSlaves);
       }, []);
     }
