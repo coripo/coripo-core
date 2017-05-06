@@ -55,7 +55,7 @@ const OneDate = function OneDate(config, helper) {
     }, helper);
   };
 
-  return { year, month, day, int, offsetYear, offsetMonth, offsetDay };
+  return { year, month, day, adapterId, int, offsetYear, offsetMonth, offsetDay };
 };
 
 module.exports = OneDate;
