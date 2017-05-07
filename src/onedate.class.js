@@ -25,6 +25,16 @@ const OneDate = function OneDate(config, helper) {
     return parseInt(`${sdate.year}${sdate.month}${sdate.day}`, 10);
   };
 
+  const stringify = (date, seperator = '') => {
+    const sdate = {
+      year: (`${date.year}`).slice(-4),
+      month: (`0${date.month}`).slice(-2),
+      day: (`0${date.day}`).slice(-2),
+    };
+
+    return `${sdate.year}${seperator}${sdate.month}${seperator}${sdate.day}`;
+  };
+
   const offsetYear = (offset) => {
     const date = adapter.offsetYear({ year, month, day }, offset);
     return new OneDate({
@@ -55,7 +65,14 @@ const OneDate = function OneDate(config, helper) {
     }, helper);
   };
 
-  return { year, month, day, adapterId, int, offsetYear, offsetMonth, offsetDay };
+  const weekday = (() => {
+    const i18nDate = adapter.i18n({ year, month, day });
+    const stringDate = stringify(i18nDate, '-');
+    const jsDate = new Date(stringDate);
+    return jsDate.getDay() + 1;
+  })();
+
+  return { year, month, day, adapterId, weekday, int, offsetYear, offsetMonth, offsetDay };
 };
 
 module.exports = OneDate;

@@ -32,6 +32,13 @@ describe('OneDate Class', () => {
     });
   });
 
+  describe('weekday', () => {
+    it('should return 5', () => {
+      const date = new OneDate(dateConfig, helper);
+      expect(date.weekday).to.equal(5);
+    });
+  });
+
   describe('offsetYear()', () => {
     it('should return 2019', () => {
       const date = new OneDate(dateConfig, helper);
