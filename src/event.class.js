@@ -110,16 +110,11 @@ const Event = function Event(config) {
           till: sequelDates.till,
         }, qSince, qTill)) return events;
 
-      const realSequel = new Event(Object.assign({}, getPrivateObject(), {
+      const realSequel = new Event(Object.assign({}, getPrivateObject(), sequel, {
         virtual: true,
         priority: priority + (index + 1),
-        title: sequel.title,
-        note: sequel.note,
-        color: sequel.color || color,
-        icon: sequel.icon || icon,
         since: sequelDates.since,
         till: sequelDates.till,
-        repeats: sequel.repeats,
         sequels: [],
       }));
       return events.concat((realSequel).query(qSince, qTill, 'event[]'));
