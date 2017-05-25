@@ -17,6 +17,17 @@ describe('Event Class', () => {
     adapterId: GREGORIAN_ADAPTER_ID,
   }, helper);
 
+  describe('.title', () => {
+    it('should return title as a custom property', () => {
+      const customTitle = 'The Event';
+      const event = new Event({
+        title: customTitle,
+        since: sampleDate,
+        till: sampleDate.offsetDay(2),
+      });
+      expect(event.title).to.equal(customTitle);
+    });
+  });
   describe('collides()', () => {
     it('should return false', () => {
       const event = new Event({
